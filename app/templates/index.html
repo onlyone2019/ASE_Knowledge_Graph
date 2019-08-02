@@ -36,7 +36,57 @@
 		margin-top: 30px;
 		border-color: #007bff;
 	}
+
+	main > div {
+		padding: 50px 70px 30px 50px;
+	}
+
+	div.card-body .row > div:nth-child(odd) {
+		text-align: right;
+		font-weight: bold;
+	}
+
+	div.card-body .row > div:nth-child(even) {
+		text-align: left;
+	}
 </style>
+{% endblock %}
+
+{% block inner_script %}
+<script>
+	$(document).ready(() => {
+		$.get("/?page=1", (data, status) => {
+			let toAddHtml = "";
+			for (let item of data)
+				toAddHtml +=
+					`<div class="card">
+						<img
+							class="card-img-top"
+							src="/static/images/test-picture.jpg"
+							alt="Card image cap"
+						/>
+						<div class="card-body text-center">
+							<h2 class="card-title"><a href="#" class="text-success">${item["事件名"]}</a></h2>
+							<div class="card-text">
+								<div class="row no-gutters">
+									<div class="col-6">时间：</div>
+									<div class="col-6">${item["时间"]}</div>
+									<div class="col-6">出事地点：</div>
+									<div class="col-6">${item["出事地点"]}</div>
+									<div class="col-6">航班号：</div>
+									<div class="col-6">${item["航班号"]}</div>
+									<div class="col-6">客机型号：</div>
+									<div class="col-6">${item["客机型号"]}</div>
+									<div class="col-6">航空公司：</div>
+									<div class="col-6">${item["航空公司"]}</div>
+								</div>
+							</div>
+						</div>
+					</div>`
+			$("main>div").html(toAddHtml);
+		})
+	})
+</script>
 {% endblock %}
 
 {% block main_content %}
@@ -44,7 +94,7 @@
 	<div class="row">
 		<aside class="col-3">
 			<div>
-				<input type="search" class="form-control" />
+				<input type="search" class="form-control" placeholder="search..." />
 				<select
 					class="selectpicker show-tick form-control"
 					data-live-search="true"
@@ -59,6 +109,8 @@
 				</button>
 			</div>
 		</aside>
-		<main class="col"></main>
+		<main class="col">
+			<div class="card-columns"></div>
+		</main>
 	</div>
 {% endblock %}
