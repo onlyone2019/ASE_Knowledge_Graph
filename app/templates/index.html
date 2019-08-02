@@ -1,8 +1,64 @@
-{% extends "base.html" %} {% block title %}首页{% endblock %} {% block outer_css
-%}
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+{% block outer_css %}
 <link
 	rel="stylesheet"
 	href="{{ url_for('static', filename='css/style.css') }}"
 />
-{% endblock %} {% block main_content %} {% include "navbar.html" %} {% endblock
-%}
+<link
+	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
+	rel="stylesheet"
+/>
+{% endblock %}
+
+{% block outer_script %}
+<script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
+{% endblock %}
+
+{% block inner_css %}
+<style>
+	aside {
+		background-color: #f7f9fc;
+		min-height: calc(100vh - 81px);
+	}
+
+	aside > div {
+		padding: 40px 20px 20px 30px;
+	}
+
+	aside > div > div {
+		margin-top: 5px;
+	}
+
+	#search-button {
+		margin-top: 30px;
+		border-color: #007bff;
+	}
+</style>
+{% endblock %}
+
+{% block main_content %}
+	{% include "navbar.html" %}
+	<div class="row">
+		<aside class="col-3">
+			<div>
+				<input type="search" class="form-control" />
+				<select
+					class="selectpicker show-tick form-control"
+					data-live-search="true"
+					title="选择查询依据"
+				>
+					<option>事故原因</option>
+					<option>时间</option>
+					<option>地点</option>
+				</select>
+				<button type="button" class="btn btn-block" id="search-button">
+					查询
+				</button>
+			</div>
+		</aside>
+		<main class="col"></main>
+	</div>
+{% endblock %}

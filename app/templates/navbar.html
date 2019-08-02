@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	<a href="/" class="navbar-brand">
+	<a href="/" class="navbar-brand" id="brand">
 		<img src="{{ url_for('static', filename='images/logo.svg') }}"
-	alt="Logo" id="logo"/>
+	alt="Logo"/>
 		ASE Knowledge Graph
 	</a>
 	<button
@@ -15,14 +15,14 @@
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<div class="navbar-nav mr-auto">
-			<a class="nav-item nav-link" href="#">事件卡片</a>
+			<a class="nav-item nav-link active" href="#">事件检索</a>
 			<a class="nav-item nav-link" href="#">模式图</a>
 		</div>
-		<div class="form-inline">
+		<!-- <div class="form-inline">
 			<input class="form-control mr-sm-2" type="search" placeholder="Search" />
 			<button class="btn btn-success my-2 my-sm-0" type="button">
 				Search
 			</button>
-		</div>
+		</div> -->
 	</div>
 </nav>

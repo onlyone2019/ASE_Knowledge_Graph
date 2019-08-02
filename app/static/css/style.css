@@ -1,11 +1,11 @@
 /* 类名均以 cus- 作为前缀，以区分 Bootstrap 的内置类 */
 
-* {
-	margin: 0;
-	padding: 0;
+#brand {
+	margin-right: 40px;
+	margin-left: 10px;
 }
 
-#logo {
+#brand > img {
 	height: 40px;
 	margin-right: 5px;
 }

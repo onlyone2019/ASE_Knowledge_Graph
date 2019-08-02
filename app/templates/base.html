@@ -16,15 +16,16 @@
 		/>
 		{% block outer_css %}{% endblock %}
 		{% block inner_css %}{% endblock %}
-		{% block outer_script %}{% endblock %}
 		{% block inner_script %}{% endblock %}
 	</head>
 	<body>
 		{% block main_content %}{% endblock %}
+
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.slim.min.js"></script>
 		<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
 		<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		{% block outer_script %}{% endblock %}
 	</body>
 </html>
