@@ -9,3 +9,37 @@
 	height: 40px;
 	margin-right: 5px;
 }
+
+#go-to-top {
+	background-color: white;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	position: fixed;
+	left: 10%;
+	bottom: 70px;
+	transform: rotate(180deg);
+	transition: transform 0.5s;
+}
+
+#go-to-top:hover {
+	transform: rotate(0deg);
+}
+
+#go-to-top > img {
+	width: 60px;
+	height: 60px;
+}
+
+#loading {
+	position: absolute;
+	right: 50%;
+	top: 50%;
+	bottom: 50%;
+}
+
+#loading > span {
+	position: relative;
+	bottom: 7px;
+	left: 10px;
+}
