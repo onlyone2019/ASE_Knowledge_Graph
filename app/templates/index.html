@@ -20,6 +20,16 @@
 
 {% block inner_css %}
 <style>
+	#event-details .modal-title {
+		text-align: center;
+		width: 100%;
+		margin: 10px 0;
+	}
+
+	#event-details .modal-body {
+		margin: 20px 40px;
+	}
+
 	aside {
 		background-color: #f7f9fc;
 		min-height: calc(100vh - 81px);
@@ -51,8 +61,25 @@
 		text-align: left;
 	}
 
-	#pager li {
+	#pager li, a.event-name {
 		cursor: pointer;
+	}
+
+	#loading-events-card {
+		position: absolute;
+		right: 50%;
+		top: 50%;
+		bottom: 50%;
+	}
+
+	#loading-event-details {
+		text-align: center;
+	}
+
+	#loading-events-card > span, #loading-event-details > span {
+		position: relative;
+		bottom: 7px;
+		left: 10px;
 	}
 </style>
 {% endblock %}
@@ -61,7 +88,8 @@
 <script>
 	window.onload = () => {
 		$('#go-to-top').on('click', goToTop);
-		$('main>div').html(getLoadingHTML);
+		$('main>div').html(getLoadingHTML('loading-events-card'));
+		$('#pager>ul').html('')
 		$.get("/all_events_intro?page=1", (data) => { showEventsCard(1, data) })
 		$('#search-button').on('click', () => {
 			$('main>div').html(getLoadingHTML);
@@ -75,6 +103,29 @@
 
 {% block main_content %}
 	{% include "navbar.html" %}
+	<div class="modal fade" id="event-details" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title text-primary"></h1>
+					<button
+						type="button"
+						class="close"
+						data-dismiss="modal"
+					>
+						<span>&times;</span>
+					</button>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						关闭
+					</button>
+					<button type="button" class="btn btn-primary">查看源文档</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<aside class="col-3">
 			<div>

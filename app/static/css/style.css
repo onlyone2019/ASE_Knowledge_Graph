@@ -30,16 +30,3 @@
 	width: 60px;
 	height: 60px;
 }
-
-#loading {
-	position: absolute;
-	right: 50%;
-	top: 50%;
-	bottom: 50%;
-}
-
-#loading > span {
-	position: relative;
-	bottom: 7px;
-	left: 10px;
-}
