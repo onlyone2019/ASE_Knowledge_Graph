@@ -48,6 +48,10 @@
 		border-color: #007bff;
 	}
 
+	#search-button:hover {
+		box-shadow: 0 0 0 3px #B9D9FD;
+	}
+
 	main > div {
 		padding: 50px 70px 30px 50px;
 	}
@@ -88,14 +92,23 @@
 <script>
 	window.onload = () => {
 		$('#go-to-top').on('click', goToTop);
-		$('main>div').html(getLoadingHTML('loading-events-card'));
+
 		$('#pager>ul').html('')
-		$.get("/all_events_intro?page=1", (data) => { showEventsCard(1, data) })
-		$('#search-button').on('click', () => {
-			$('main>div').html(getLoadingHTML);
+		$('main>div').html(getLoadingHTML('loading-events-card'));
+		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
+
+		let search = () => {
 			key = $('aside select').find('option:selected').html()
 			value = $('#search-input').val();
-			$.get(`/events_intro?key=${key}&value=${value}`, (data) => { showEventsCard(1, data) })
+			if (key && value) {
+				$('#pager>ul').html('')
+				$('main>div').html(getLoadingHTML("loading-events-card"));
+				$.get(`/events_intro?key=${key}&value=${value}`, data => { showSearchedEventCards(data) })
+			}
+		}
+		$('#search-button').on('click', search);
+		$('#search-button, #search-input').keypress(event => {
+			if (event.keyCode === 13) search();
 		})
 	}
 </script>
