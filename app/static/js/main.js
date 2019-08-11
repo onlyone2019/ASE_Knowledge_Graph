@@ -15,7 +15,7 @@ function getCardHTML(item) {
 		<div class="card">
 			<img
 				class="card-img-top"
-				src="/static/images/test-picture.jpg"
+				src="/static/aircrafts/${item["客机型号"]}.jpeg"
 				alt="${item["客机型号"]}"
 			/>
 			<div class="card-body text-center">
