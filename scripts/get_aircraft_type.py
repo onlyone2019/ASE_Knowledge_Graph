@@ -14,4 +14,5 @@ data = graph.run(cypher).data()
 
 with open("客机型号.txt", 'w') as f:
     for i in data:
-        f.write(re.search(r'\(_\d{4}:\w+ \{', str(i['b'])).group()[7:-2] + '\n')
+        matcher = re.search(r'\(_\d+:\w+ \{', str(i['b']))
+        f.write(matcher.group().split(':')[1][:-2] + '\n')
