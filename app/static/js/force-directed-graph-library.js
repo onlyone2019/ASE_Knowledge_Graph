@@ -7,6 +7,15 @@ function createSvg(width, height, parent) {
 		.attr("height", height);
 }
 
+// 统计字符串包含的字符个数，汉字算两个字符
+function calcCharNum(string) {
+	let charNum = 0;
+	if (!string) return 0;
+	for (let i = 0; i < string.length; i++)
+		charNum += string.charCodeAt(i) > 255 ? 2 : 1;
+	return charNum;
+}
+
 function forceDirectedGraph(svg) {
 	let _forceChart = {};
 	let _nodeRadius = 30; // 最大结点半径(group 为 0 结点的半径)。其他结点会被缩放 1 - group / 10 倍。
@@ -49,42 +58,18 @@ function forceDirectedGraph(svg) {
 	/******** ↑ 获取或设置属性值 *********/
 
 	_forceChart.render = () => {
-		/******** ↓ 拖曳事件回调函数 *********/
-
-		function dragStarted(d) {
-			if (!d3.event.active) _simulation.alphaTarget(1).restart();
-			d.fx = d.x;
-			d.fy = d.y;
-		}
-
-		function dragged(d) {
-			d.fx = d3.event.x;
-			d.fy = d3.event.y;
-		}
-
-		function dragEnded(d) {
-			if (!d3.event.active) _simulation.alphaTarget(0);
-			d.fx = null;
-			d.fy = null;
-		}
-
-		/******** ↑ 拖曳事件回调函数 *********/
-
-		/******** ↓ 创建力布局 *********/
-
 		let _simulation = d3
-			.forceSimulation()
-			.force("charge", d3.forceManyBody())
+			.forceSimulation() // 创建力布局
+			.alphaDecay(0.01) // alpha 衰减速度
+			.force("charge", d3.forceManyBody().strength(-300)) // 多体力（多体力可以模拟引力和斥力）
 			.force(
 				"collision",
 				d3.forceCollide(_nodeRadius + _nodeSpacing).strength(1)
-			)
+			) // 碰撞力
 			.force(
 				"center",
 				d3.forceCenter(svg.attr("width") / 2, svg.attr("height") / 2)
-			);
-
-		/******** ↑ 创建力布局 *********/
+			); // 中心力
 
 		d3.json(_jsonUrl).then(data => {
 			_simulation.nodes(data.nodes);
@@ -93,24 +78,10 @@ function forceDirectedGraph(svg) {
 				d3
 					.forceLink(data.links)
 					.strength(1)
-					.distance(200)
+					.distance(150)
 					.id(d => d.index)
-			);
-			_simulation.on("tick", e => {
-				link
-					.attr("x1", d => d.source.x)
-					.attr("y1", d => d.source.y)
-					.attr("x2", d => d.target.x)
-					.attr("y2", d => d.target.y);
-				linkText
-					.attr("x", d => (d.source.x + d.target.x) / 2)
-					.attr("y", d => (d.source.y + d.target.y) / 2);
-
-				nodeG.attr(
-					"transform",
-					d => `translate(${d.x}, ${d.y}) scale(${1 - d.group / 10})`
-				);
-			});
+			); // 连接力
+			_simulation.on("tick", ticked); // 监听 tick 事件
 
 			/******** ↓ 创建组成力导向图的元素 *********/
 
@@ -173,15 +144,105 @@ function forceDirectedGraph(svg) {
 
 			/******** ↓ 监听各种事件 *********/
 
-			nodeG.on("mouseenter", function() {});
+			nodeG.on("mouseenter", enterNodeG);
 
-			nodeG.on("mouseleave", function() {});
+			nodeG.on("mouseleave", leaveNodeG);
 
 			nodeG.on("click", function() {});
 
 			nodeG.on("dbclick", function() {});
 
 			/******** ↑ 监听各种事件 *********/
+
+			/******** ↓ 事件处理程序 *********/
+
+			function enterNodeG(d) {
+				const G_ANGLE = Math.PI / 4; // g 元素的偏移角度
+				const LINE1_WIDTH = _nodeRadius / 2; // 斜线的长度
+				const LINE1_ANGLE = Math.PI / 4; // 斜线的水平偏角
+				const LINE2_WIDTH = d.id.length * _fontSize + 15; // 直线的长度
+
+				let gOffestX = Math.sin(G_ANGLE) * _nodeRadius; // g 元素在 X 方向上的偏移量
+				let gOffestY = -(Math.cos(G_ANGLE) * _nodeRadius); // g 元素在 Y 方向上的偏移量
+				let line1X = LINE1_WIDTH * Math.cos(LINE1_ANGLE); // 斜线在 X 方向上的长度
+				let line1Y = LINE1_WIDTH * Math.sin(LINE1_ANGLE); // 斜线在 Y 方向上的长度
+
+				let theNode = d3.select(this);
+				let detailsG = theNode
+					.append("g")
+					.attr("transform", `translate(${gOffestX}, ${gOffestY})`)
+					.classed("details", true);
+				detailsG
+					.append("line")
+					.attr("x1", 0)
+					.attr("y1", 0)
+					.attr("x2", line1X)
+					.attr("y2", -line1Y)
+					.style("stroke", "black")
+					.style("stroke-width", "1px");
+				detailsG
+					.append("line")
+					.attr("x1", line1X)
+					.attr("y1", -line1Y)
+					.attr("x2", line1X + LINE2_WIDTH)
+					.attr("y2", -line1Y)
+					.style("stroke", "black")
+					.style("stroke-width", "1px");
+				detailsG
+					.append("text")
+					.attr("x", line1X + 7.5)
+					.attr("y", -(line1Y + 3))
+					.attr("font-size", _fontSize)
+					.text(d.id);
+			}
+
+			function leaveNodeG() {
+				d3.select(this)
+					.select("g.details")
+					.remove();
+			}
+
+			function ticked(e) {
+				link
+					.attr("x1", d => d.source.x)
+					.attr("y1", d => d.source.y)
+					.attr("x2", d => d.target.x)
+					.attr("y2", d => d.target.y);
+				linkText
+					.attr("x", d => (d.source.x + d.target.x) / 2)
+					.attr("y", d => (d.source.y + d.target.y) / 2);
+
+				nodeG.attr(
+					"transform",
+					d => `translate(${d.x}, ${d.y}) scale(${1 - d.group / 10})`
+				);
+			}
+
+			function dragStarted(d) {
+				if (!d3.event.active) _simulation.alphaTarget(0.3).restart();
+				d.fx = d.x;
+				d.fy = d.y;
+
+				nodeG.on("mouseenter", null);
+				d3.select(this)
+					.select("g.details")
+					.remove();
+			}
+
+			function dragged(d) {
+				d.fx = d3.event.x;
+				d.fy = d3.event.y;
+			}
+
+			function dragEnded(d) {
+				if (!d3.event.active) _simulation.alphaTarget(0);
+				d.fx = null;
+				d.fy = null;
+
+				nodeG.on("mouseenter", enterNodeG);
+			}
+
+			/******** ↑ 事件处理程序*********/
 		});
 	};
 
