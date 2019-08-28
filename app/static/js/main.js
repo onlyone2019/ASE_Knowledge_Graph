@@ -11,6 +11,19 @@ function getLoadingHTML(id) {
 }
 
 function getCardHTML(item) {
+	let eventInfoHTML = "";
+	for (let i of ["日期", "出事地点", "航班号", "客机型号", "航空公司"]) {
+		if (item[i])
+			if (i == "日期")
+				eventInfoHTML += `
+					<div class="col-6">${i}：</div><div class="col-6">${item[i].slice(0, 4) +
+					"/" +
+					item[i].slice(4, 6) +
+					"/" +
+					item[i].slice(6)}</div>`;
+			else
+				eventInfoHTML += `<div class="col-6">${i}：</div><div class="col-6">${item[i]}</div>`;
+	}
 	return `
 		<div class="card">
 			<img
@@ -23,24 +36,14 @@ function getCardHTML(item) {
 					item["事件名"]
 				}</a></h2>
 				<div class="card-text">
-					<div class="row no-gutters">
-						<div class="col-6">日期：</div>
-						<div class="col-6">${item["日期"]}</div>
-						<div class="col-6">出事地点：</div>
-						<div class="col-6">${item["出事地点"]}</div>
-						<div class="col-6">航班号：</div>
-						<div class="col-6">${item["航班号"]}</div>
-						<div class="col-6">客机型号：</div>
-						<div class="col-6">${item["客机型号"]}</div>
-						<div class="col-6">航空公司：</div>
-						<div class="col-6">${item["航空公司"]}</div>
-					</div>
+					<div class="row no-gutters">${eventInfoHTML}</div>
 				</div>
 			</div>
 		</div>`;
 }
 
-function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分页）
+function showAllEventCards(page, data) {
+	// 显示所有事件卡片（后端分页）
 	page = Number(page);
 	let jsonArray = JSON.parse(data);
 	let pageNum = jsonArray[jsonArray.length - 1]["page_num"];
@@ -54,11 +57,11 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 
 	let showButtonNum = 15; // 显示的分页按钮个数
 	if (pageNum <= showButtonNum) showButtonNum = pageNum;
-	let pagerButtomHTML = (text, isActive) => {
+	let pagerButtomHTML = (text, isActive, id = "") => {
 		if (isActive)
-			return `<li class="page-item active"><div class="page-link">${text}</div></li>`;
+			return `<li class="page-item active" id="${id}"><div class="page-link">${text}</div></li>`;
 		else
-			return `<li class="page-item"><div class="page-link">${text}</div></li>`;
+			return `<li class="page-item" id="${id}"><div class="page-link">${text}</div></li>`;
 	};
 	let pagerMiddleButton = Math.ceil(showButtonNum * 0.5) + 1; // Math.ceil() 向上取整。为了更美观，加个一
 	let middleLeftNum = pagerMiddleButton - 1;
@@ -78,7 +81,9 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 		endButton = page + middleRightNum;
 		addEllipsis = "both";
 	}
-	let toAddPager = pagerButtomHTML("&laquo;");
+	let toAddPager =
+		pagerButtomHTML("Home", false, "pager-home") +
+		pagerButtomHTML("Prev", false, "pager-previous");
 	if (addEllipsis === "front" || addEllipsis === "both")
 		toAddPager += pagerButtomHTML("...");
 	for (let i = startButton; i <= endButton; i++) {
@@ -87,14 +92,16 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 	}
 	if (addEllipsis === "back" || addEllipsis === "both")
 		toAddPager += pagerButtomHTML("...");
-	toAddPager += pagerButtomHTML("&raquo;");
+	toAddPager +=
+		pagerButtomHTML("Next", false, "pager-next") +
+		pagerButtomHTML("End", false, "pager-end");
 
 	$("#pager>ul").html(toAddPager);
 	$("#pager li").on("click", obj => {
 		if (
-			obj.target.innerHTML != "«" &&
-			obj.target.innerHTML != "»" &&
-			obj.target.innerHTML != "..."
+			["Home", "Previous", "Next", "End", "..."].indexOf(
+				obj.target.innerHTML
+			) == -1
 		) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
@@ -103,7 +110,7 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 			});
 		}
 	});
-	$("#pager li:first-child").on("click", () => {
+	$("#pager #pager-previous").on("click", () => {
 		if (page > 1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
@@ -112,7 +119,7 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 			});
 		}
 	});
-	$("#pager li:last-child").on("click", () => {
+	$("#pager #pager-next").on("click", () => {
 		if (page < pageNum) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
@@ -121,9 +128,28 @@ function showAllEventCards(page, data) {	// 显示所有事件卡片（后端分
 			});
 		}
 	});
+	$("#pager #pager-home").on("click", () => {
+		if (page != 1) {
+			$("main>div").html(getLoadingHTML("loading-events-card"));
+			$("#pager>ul").html("");
+			$.get(`/all_events_intro?page=${1}`, data => {
+				showAllEventCards(1, data);
+			});
+		}
+	});
+	$("#pager #pager-end").on("click", () => {
+		if (page != pageNum) {
+			$("main>div").html(getLoadingHTML("loading-events-card"));
+			$("#pager>ul").html("");
+			$.get(`/all_events_intro?page=${pageNum}`, data => {
+				showAllEventCards(pageNum, data);
+			});
+		}
+	});
 }
 
-function showSearchedEventCards(data) {	// 不分页
+function showSearchedEventCards(data) {
+	// 不分页
 	let jsonArray = JSON.parse(data);
 	let toAddHtml = "";
 	jsonArray.forEach(item => {
