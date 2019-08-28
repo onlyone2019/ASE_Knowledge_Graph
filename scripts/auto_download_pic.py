@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # 需要 chromedriver、chrome 浏览器、Ghelper 浏览器插件
+# 在项目根目录下，使用 "python scripts/auto_download_pic.py" 命令运行该脚本
 
 from selenium import webdriver
 from PIL import Image
@@ -23,7 +24,7 @@ class Pic_spider:
         sleep(2)
         element = self.driver.find_element_by_css_selector('[id="sbtc"] input')
         element.clear()
-        element.send_keys(aircraft + '\n')
+        element.send_keys(aircraft.replace('_', '-') + '\n')    # 将下划线换成 -，提高准确率
 
         sleep(2)
         try:
@@ -31,7 +32,7 @@ class Pic_spider:
             for pic in pictures:
                 image = Image.open(BytesIO(b64decode(pic.get_attribute('src').split(',')[-1].replace('%0A', '\n'))))
                 pic_width, pic_height = image.size
-                if pic_width / pic_height > 1.5:
+                if pic_width / pic_height > 1.5:    # 只保存图片宽高比大于 1.5 的图片
                     image.save('%s.jpeg' % aircraft)
                     return 1
         except:
@@ -42,14 +43,11 @@ class Pic_spider:
 
 
 if __name__ == "__main__":
-    try:
-        os.mkdir('aircraft_images')
-    except:
-        pass
     with open('客机型号.txt', 'r') as f:
         to_download = {i[:-1] for i in f.readlines()}   # 集合推导式，去除重复项和行尾换行符
-    os.chdir('aircraft_images')
-    already_exist = os.listdir()
+    os.mkdir('aircraft_pictures')
+    os.chdir('aircraft_pictures')
+    already_exist = os.listdir('../app/static/aircrafts')
 
     pic_spider = Pic_spider()
     pic_spider.startup()
