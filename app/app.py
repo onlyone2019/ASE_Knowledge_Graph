@@ -25,10 +25,10 @@ def index():
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def all_events_intro():  # 返回page页事件的简介信息
     per_page = 15  # 每页中包含的事件个数
-    page_num = math.ceil(graph.run('match (a:航空安全事件) match (a)-[:`包含`]->(b) return count(b)').data()[0][
+    page_num = math.ceil(graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return count(b)').data()[0][
                              'count(b)'] / per_page)  # 计算总页数，ceil 用于向上取整
     page = request.args['page']  # get 请求的 url 类似这样：/events_intro?page=1。问号后面的参数会以字典的形式存放在 request.args 中。
-    data = graph.run('match (a:航空安全事件) match (a)-[:`包含`]->(b) return b.name')
+    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.name')
     strdata = []
     for i in data:
         strdata.append('S' + str(i['b.name']))
