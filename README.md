@@ -18,52 +18,62 @@ A knowledge graph of aviation safety event.
 
 @xingxingyxx 负责后端逻辑。
 
-## Preview
+## 项目预览
 
-搭建相关环境后可运行和预览项目。
+在线演示地址：[http://47.94.94.136:5000](http://47.94.94.136:5000)
+
+## 如何贡献
 
 步骤（注：前两步只在第一次运行时执行）：
 
 1. 安装用于管理 python 虚拟环境的包 `pipenv`：
 
-   ```shell
+   ```bash
    pip install pipenv
    ```
 
 2. 进入项目目录，创建虚拟环境并安装依赖包：
 
-   ```shell
-   cd ASE_knowledge_graph
+   ```bash
+   cd ASE_Knowledge_Graph
    pipenv install	# 这一步如果失败，将 Pipfile 和 Pipfile.lock 中的 python_version 改为你电脑里安装的 Python 版本即可
    ```
 
 3. 进入虚拟环境：
 
-   ```shell
+   ```bash
    pipenv shell
    ```
 
-4. 配置临时环境变量：
+4. 配置临时环境变量（临时环境变量仅在当前 shell 中有效）：
 
-   Linux：
+   Linux / Mac OS:
 
-   ```shell
-   export FLASK_APP=app/app.py
+   ```bash
+   export FLASK_APP=app/app.py  # 指定次应用的入口文件
    export FLASK_DEBUG=1	# 开启 debug 模式
    ```
 
-   Windows cmd：
+   Windows cmd:
 
-   ```powershell
+   ```cmd
    set FLASK_APP=app/app.py
    set FLASK_DEBUG=1
    ```
 
-5. 启动应用程序和 neo4j 数据库：
+   Windows powershell:
 
-   ```shell
-   flask run
-   neo4j start
+   ```powershell
+   $Env:FLASK_APP=app/app.py
+   $Env:FLASK_DEBUG=1
    ```
 
-   浏览器输入 `http://localhost:5000` 即可访问。
+5. 启动应用程序：
+
+   ```bash
+   flask run    # 或 python -m flask run
+   ```
+
+6. 启动 neo4j 数据库
+
+7. 浏览器输入 `http://localhost:5000` 即可访问。
