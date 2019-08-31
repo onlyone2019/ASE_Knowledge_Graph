@@ -1,5 +1,5 @@
 function forceDirectedGraph(svg) {
-	let _forceChart = {};
+	let _graph = {};
 	let _nodeRadius = 30; // 最大结点半径(group 为 0 结点的半径)。其他结点会被缩放 1 - group / 10 倍。
 	let _nodeSpacing = 1; // 结点间最小距离
 	let _fontSize = 12; // 结点和链接文字大小
@@ -8,38 +8,38 @@ function forceDirectedGraph(svg) {
 
 	/******** ↓ 获取或设置属性值 *********/
 
-	_forceChart.nodeRadius = nr => {
+	_graph.nodeRadius = nr => {
 		if (!nr) return _nodeRadius;
 		_nodeRadius = nr;
-		return _forceChart;
+		return _graph;
 	};
 
-	_forceChart.nodeSpacing = ns => {
+	_graph.nodeSpacing = ns => {
 		if (!ns) return _nodeSpacing;
 		_nodeSpacing = ns;
-		return _forceChart;
+		return _graph;
 	};
 
-	_forceChart.fontSize = fs => {
+	_graph.fontSize = fs => {
 		if (!fs) return _fontSize;
 		_fontSize = fs;
-		return _forceChart;
+		return _graph;
 	};
 
-	_forceChart.json = ju => {
+	_graph.json = ju => {
 		if (!ju) return _jsonUrl;
 		_jsonUrl = ju;
-		return _forceChart;
+		return _graph;
 	};
 
-	_forceChart.colorScheme = cs => {
+	_graph.colorScheme = cs => {
 		_colorScale = d3.scaleOrdinal(cs);
-		return _forceChart;
+		return _graph;
 	};
 
 	/******** ↑ 获取或设置属性值 *********/
 
-	_forceChart.render = () => {
+	_graph.render = () => {
 		let _simulation = d3
 			.forceSimulation() // 创建力布局
 			.alphaDecay(0.01) // alpha 衰减速度
@@ -228,5 +228,5 @@ function forceDirectedGraph(svg) {
 		});
 	};
 
-	return _forceChart;
+	return _graph;
 }
