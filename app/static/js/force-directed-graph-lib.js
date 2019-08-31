@@ -1,21 +1,3 @@
-function createSvg(width, height, parent) {
-	if (!parent) parent = "body";
-	return d3
-		.select(parent)
-		.append("svg")
-		.attr("width", width)
-		.attr("height", height);
-}
-
-// 统计字符串包含的字符个数，汉字算两个字符
-function calcCharNum(string) {
-	let charNum = 0;
-	if (!string) return 0;
-	for (let i = 0; i < string.length; i++)
-		charNum += string.charCodeAt(i) > 255 ? 2 : 1;
-	return charNum;
-}
-
 function forceDirectedGraph(svg) {
 	let _forceChart = {};
 	let _nodeRadius = 30; // 最大结点半径(group 为 0 结点的半径)。其他结点会被缩放 1 - group / 10 倍。
