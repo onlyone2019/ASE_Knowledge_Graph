@@ -21,7 +21,6 @@ matcher = NodeMatcher(graph)
 def index():
     return render_template("index.html")
 
-
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def all_events_intro():  # 返回page页事件的简介信息
     per_page = 15  # 每页中包含的事件个数
@@ -62,8 +61,6 @@ def all_events_intro():  # 返回page页事件的简介信息
     print(get_events)
     return json.dumps(get_events, ensure_ascii=False)  # 打包成 json 返回
 
-
-# all_events_intro()
 
 @app.route('/events_intro')
 def events_intro():  # 返回指定属性的事件简介信息
@@ -137,8 +134,6 @@ def events_intro():  # 返回指定属性的事件简介信息
     events_info.append({'page_num': page_num})
     return json.dumps(events_info, ensure_ascii=False)
 
-
-# events_intro()
 @app.route('/event_info')
 def event_info():  # 根据事件名返回事件所有属性
     event_name = request.args['event_name']
@@ -201,7 +196,7 @@ def event_info():  # 根据事件名返回事件所有属性
 
 
 @app.route('/patt_node')
-def patt_node():
+def patt_node():#返回模式结点和边（source:link:target）
     patt_nodes = {}
     nodes = []
     pat_nodes = graph.run('match (a:模式) return a.name,a.grade')
@@ -235,5 +230,34 @@ def patt_node():
     print(patt_nodes)
     return json.dumps(link, ensure_ascii=False)
 
+@app.route('/get_eventname')
+def get_eventname():  #返回所有事件名
+    eventName = []
+    findname = graph.run("match (a:事件名称) match (a)-[:包含]->(b) return b.name")
+    for data in findname:
+        eventName.append(data['b.name'])
+    return json.dumps(eventName, ensure_ascii=False)
 
-# patt_node()
+@app.route('/get_patternDetails')
+def get_patternDetails():  #返回模式图下的具体数据节点
+    key = request.args['key']
+    value = request.args['value']
+    details=[]
+    finddetail = graph.run("match (a:模式{name:'" + key + "'}) match (a)-[:`包含`]->(b) return b.name limit " + value)
+    for detail in finddetail:
+        details.append(detail['b.name'])
+    return json.dumps(details, ensure_ascii=False)
+
+@app.route('/get_reasonParticiple')
+def get_reasonParticiple():  #返回原因的分词
+    result = {}
+    findreason = graph.run("match (a:模式{name:'原因'}) match (a)-[:包含]->(b) return b.name")
+    for data in findreason:
+        seg_list = jieba.cut(str(data['b.name']), cut_all=False)
+        for detail in seg_list:
+            if result.get(detail, -1) == -1:
+                result[detail] = 1
+            else:
+                result[detail] += 1
+    result = sorted(result.items(), key=lambda x: x[1], reverse=False)
+    return json.dumps(result, ensure_ascii=False)
