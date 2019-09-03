@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block outer_css %}
+<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/style.css') }}"
+/>
+<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/chart.css') }}"
+/>
+{% endblock %}
+
+{% block outer_script %}
+<script src="{{ url_for('static', filename='js/chart-lib.js') }}"></script>
+<script src="{{ url_for('static', filename='js/force-directed-graph-lib.js') }}"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+{% endblock %}
+
+{% block inner_script %}
+<script>
+	window.onload = () => {
+		const WIDTH = screen.availWidth;
+		const HEIGHT = screen.availHeight - 66;	// 66 是导航栏高度
+		// 这个高度让 svg 在浏览器全屏模式下刚好占满屏幕
+
+		let svg = createSvg(WIDTH, HEIGHT, true);
+		let aForceDirectedGraph = forceDirectedGraph(svg)
+			.json("/patt_node")
+			.render();
+	}
+</script>
+{% endblock %}
+
+{% block main_content %}
+	{% include "include/navbar.html" %}
+	<script>
+		document
+			.querySelector("#navbar-text>a:nth-child({{ active }})")
+			.classList.add("active");
+	</script>
+{% endblock %}

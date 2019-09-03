@@ -1,6 +1,6 @@
 function forceDirectedGraph(svg) {
 	let _graph = {};
-	let _nodeRadius = 30; // 最大结点半径(group 为 0 结点的半径)。其他结点会被缩放 1 - group / 10 倍。
+	let _nodeRadius = 30; // 最大结点半径(grade 为 0 结点的半径)。其他结点会被缩放 1 - grade / 10 倍。
 	let _nodeSpacing = 1; // 结点间最小距离
 	let _fontSize = 12; // 结点和链接文字大小
 	let _jsonUrl;
@@ -61,7 +61,7 @@ function forceDirectedGraph(svg) {
 					.forceLink(data.links)
 					.strength(1)
 					.distance(150)
-					.id(d => d.index)
+					.id(d => d.id)
 			); // 连接力
 			_simulation.on("tick", ticked); // 监听 tick 事件
 
@@ -83,7 +83,7 @@ function forceDirectedGraph(svg) {
 				.enter()
 				.append("text")
 				.text(d => d.linkText)
-				.style("font-size", _fontSize);
+				.style("font-size", _fontSize * 0.7);
 
 			let nodeG = svg
 				.append("g")
@@ -103,7 +103,7 @@ function forceDirectedGraph(svg) {
 			nodeG
 				.append("circle")
 				.attr("r", _nodeRadius)
-				.style("fill", d => _colorScale(d.group))
+				.style("fill", d => _colorScale(d.grade))
 				.style("stroke", "gray");
 
 			nodeG
@@ -132,7 +132,7 @@ function forceDirectedGraph(svg) {
 
 			nodeG.on("click", function() {});
 
-			nodeG.on("dbclick", function() {});
+			nodeG.on("dblclick", showMoreNode);
 
 			/******** ↑ 监听各种事件 *********/
 
@@ -184,6 +184,11 @@ function forceDirectedGraph(svg) {
 					.remove();
 			}
 
+			function showMoreNode(d) {
+				// currentNode = d3.select(this);
+				// d3.json(`/pattern_details?name=${d.id}&limit=15`).then(newData => {});
+			}
+
 			function ticked(e) {
 				link
 					.attr("x1", d => d.source.x)
@@ -196,7 +201,7 @@ function forceDirectedGraph(svg) {
 
 				nodeG.attr(
 					"transform",
-					d => `translate(${d.x}, ${d.y}) scale(${1 - d.group / 10})`
+					d => `translate(${d.x}, ${d.y}) scale(${1 - d.grade / 10})`
 				);
 			}
 

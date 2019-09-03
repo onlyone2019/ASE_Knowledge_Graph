@@ -6,22 +6,15 @@ function createSvg(width, height, canZoom = false, parent = "body") {
 		.attr("height", height);
 
 	if (canZoom) {
-		let g = svg
-			.append("g")
-			.attr("transform", `translate(${width / 2}, ${height / 2})`);
-		svg.call(
-			d3
-				.zoom()
-				.scaleExtent([0.2, 5])
-				.on("zoom", () => {
-					let transform = d3.event.transform;
-					g.attr(
-						"transform",
-						`translate(${transform.x + width / 2}, ${transform.y +
-							height / 2})scale(${transform.k})`
-					);
-				})
-		);
+		let g = svg.append("g");
+		let zoom = d3
+			.zoom()
+			.scaleExtent([0.2, 5])
+			.on("zoom", () => {
+				g.attr("transform", d3.event.transform);
+			});
+		svg.call(zoom).on("dblclick.zoom", null); // 删除 svg 的双击缩放事件
+		svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2));
 		return g;
 	} else return svg;
 }

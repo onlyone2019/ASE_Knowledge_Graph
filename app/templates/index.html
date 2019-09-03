@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}首页{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block outer_css %}
 <link
@@ -16,6 +16,7 @@
 {% block outer_script %}
 <script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
 
 {% block inner_css %}
@@ -91,6 +92,7 @@
 {% block inner_script %}
 <script>
 	window.onload = () => {
+		$('#navbar-text:nth-child({{ active }})').addClass("active");
 		$('#go-to-top').on('click', goToTop);
 
 		$('#pager>ul').html('')
@@ -116,6 +118,11 @@
 
 {% block main_content %}
 	{% include "include/navbar.html" %}
+	<script>
+		document
+			.querySelector("#navbar-text>a:nth-child({{ active }})")
+			.classList.add("active");
+	</script>
 	<div class="modal fade" id="event-details" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 			<div class="modal-content">
