@@ -10,6 +10,10 @@ flask = "*"
 pylint = "*"
 autopep8 = "*"
 py2neo = "*"
+jieba = "*"
+flask-mail = "*"
+flask-wtf = "*"
+flask-login = "*"
 
 [requires]
 python_version = "3.7"
