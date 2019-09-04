@@ -36,9 +36,4 @@
 
 {% block main_content %}
 	{% include "include/navbar.html" %}
-	<script>
-		document
-			.querySelector("#navbar-text>a:nth-child({{ active }})")
-			.classList.add("active");
-	</script>
 {% endblock %}

@@ -1,5 +1,5 @@
 function goToTop() {
-	window.scroll(0, 0);
+	$("html, body").animate({ scrollTop: 0 }, "slow");
 }
 
 function getLoadingHTML(id) {

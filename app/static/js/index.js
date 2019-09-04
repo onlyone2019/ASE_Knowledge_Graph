@@ -1,5 +1,14 @@
 function getCardHTML(item) {
+	let aircraftImageHTML = "";
 	let eventInfoHTML = "";
+	if (item["客机型号"]) {
+		aircraftImageHTML = `
+			<img
+				class="card-img-top"
+				src="/static/aircrafts/${item["客机型号"].trim()}.jpeg"
+				alt="${item["客机型号"].trim()}"
+			/>`;
+	}
 	for (let i of ["日期", "出事地点", "航班号", "客机型号", "航空公司"]) {
 		if (item[i])
 			if (i == "日期")
@@ -14,11 +23,7 @@ function getCardHTML(item) {
 	}
 	return `
 		<div class="card">
-			<img
-				class="card-img-top"
-				src="/static/aircrafts/${item["客机型号"]}.jpeg"
-				alt="${item["客机型号"]}"
-			/>
+			${aircraftImageHTML}
 			<div class="card-body text-center">
 				<h2 class="card-title"><a class="text-success event-name" data-toggle="modal" data-target="#event-details">${
 					item["事件名"]
@@ -33,7 +38,7 @@ function getCardHTML(item) {
 function showAllEventCards(page, data) {
 	// 显示所有事件卡片
 	page = Number(page);
-	let jsonArray = JSON.parse(data);
+	let jsonArray = data;
 	let pageNum = jsonArray[jsonArray.length - 1]["page_num"];
 	jsonArray.pop();
 	let toAddHtml = "";
@@ -138,7 +143,7 @@ function showAllEventCards(page, data) {
 
 function showSearchedEventCards(data) {
 	// 以卡片的形式展示按条件搜索到的事件简介信息
-	let jsonArray = JSON.parse(data);
+	let jsonArray = data;
 	let toAddHtml = "";
 	jsonArray.forEach(item => {
 		toAddHtml += getCardHTML(item);

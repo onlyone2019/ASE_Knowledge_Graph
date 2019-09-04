@@ -33,14 +33,17 @@
 
 	aside {
 		background-color: #f7f9fc;
-		min-height: calc(100vh - 81px);
+		min-height: 100%;
+		width: 25%;
+		position: fixed;
+		margin-top: 66px;
 	}
 
-	aside > div:first-child {
+	aside > div {
 		padding: 40px 20px 20px 30px;
 	}
 
-	aside > div:first-child > div {
+	aside > div > div {
 		margin-top: 5px;
 	}
 
@@ -53,8 +56,16 @@
 		box-shadow: 0 0 0 3px #B9D9FD;
 	}
 
+	main {
+		width: 75%;
+		position: absolute;
+		right: 0;
+		min-height: 100%;
+	}
+
 	main > div {
-		padding: 50px 70px 30px 50px;
+		margin-top: 66px;
+		padding: 50px 70px 30px 70px;
 	}
 
 	div.card-body .row > div:nth-child(odd) {
@@ -86,13 +97,44 @@
 		bottom: 7px;
 		left: 10px;
 	}
+
+	@media (max-width: 993px) {
+		aside {
+			background-color: #343A40;
+			width: 100vw;
+			min-height: 0;
+			display: none;
+			margin-top: 170px;
+			z-index: 1;
+		}
+
+		aside > div {
+			padding: 20px 40px;
+		}
+
+		#search-button {
+			color: white;
+			border-color: white;
+		}
+
+		main {
+			width: 100%;
+		}
+
+		main > div {
+			padding: 40px 50px;
+		}
+
+		#loading-events-card {
+			right: 40%;
+		}
+	}
 </style>
 {% endblock %}
 
 {% block inner_script %}
 <script>
 	window.onload = () => {
-		$('#navbar-text:nth-child({{ active }})').addClass("active");
 		$('#go-to-top').on('click', goToTop);
 
 		$('#pager>ul').html('')
@@ -118,11 +160,6 @@
 
 {% block main_content %}
 	{% include "include/navbar.html" %}
-	<script>
-		document
-			.querySelector("#navbar-text>a:nth-child({{ active }})")
-			.classList.add("active");
-	</script>
 	<div class="modal fade" id="event-details" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 			<div class="modal-content">
@@ -146,44 +183,42 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<aside class="col-3">
-			<div>
-				<input type="search" id="search-input" class="form-control" placeholder="search..." />
-				<select
-					class="selectpicker show-tick form-control"
-					data-live-search="true"
-					title="选择查询依据"
-				>
-					<option>事件名称</option>
-					<option>时间</option>
-					<option>客机型号</option>
-					<option>航空公司</option>
-					<option>航班号</option>
-					<option>起飞地点</option>
-					<option>降落地点</option>
-					<option>出事地点</option>
-					<option>事件类型</option>
-					<option>航线类型</option>
-					<option>航班类型</option>
-					<option>天气情况</option>
-					<option>操作阶段</option>
-					<option>直接原因</option>
-					<option>人员伤亡</option>
-					<option>结果</option>
-					<option>等级</option>
-				</select>
-				<button type="button" class="btn btn-block" id="search-button">
-					查询
-				</button>
-			</div>
-			<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
-		</aside>
-		<main class="col">
-			<div class="card-columns"></div>
-			<nav id="pager">
-				<ul class="pagination justify-content-center"></ul>
-			</nav>
-		</main>
-	</div>
+	<aside>
+		<div>
+			<input type="search" id="search-input" class="form-control" placeholder="search..." />
+			<select
+				class="selectpicker show-tick form-control"
+				data-live-search="true"
+				title="选择查询依据"
+			>
+				<option>事件名称</option>
+				<option>时间</option>
+				<option>客机型号</option>
+				<option>航空公司</option>
+				<option>航班号</option>
+				<option>起飞地点</option>
+				<option>降落地点</option>
+				<option>出事地点</option>
+				<option>事件类型</option>
+				<option>航线类型</option>
+				<option>航班类型</option>
+				<option>天气情况</option>
+				<option>操作阶段</option>
+				<option>直接原因</option>
+				<option>人员伤亡</option>
+				<option>结果</option>
+				<option>等级</option>
+			</select>
+			<button type="button" class="btn btn-block" id="search-button">
+				查询
+			</button>
+		</div>
+	</aside>
+	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
+	<main>
+		<div class="card-columns"></div>
+		<nav id="pager">
+			<ul class="pagination justify-content-center"></ul>
+		</nav>
+	</main>
 {% endblock %}

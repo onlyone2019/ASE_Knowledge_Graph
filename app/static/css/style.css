@@ -1,5 +1,3 @@
-/* 类名均以 cus- 作为前缀，以区分 Bootstrap 的内置类 */
-
 #brand {
 	margin-right: 40px;
 	margin-left: 10px;
@@ -20,6 +18,8 @@
 	bottom: 70px;
 	transform: rotate(180deg);
 	transition: transform 0.5s;
+	z-index: 10;
+	cursor: pointer;
 }
 
 #go-to-top:hover {
@@ -29,4 +29,32 @@
 #go-to-top > img {
 	width: 60px;
 	height: 60px;
+}
+
+.no-transition {
+	-webkit-transition: height 0.01s;
+	-moz-transition: height 0.01s;
+	-ms-transition: height 0.01s;
+	-o-transition: height 0.01s;
+	transition: height 0.01s;
+}
+
+@media (max-width: 993px) {
+	#navbarSupportedContent div {
+		padding: 15px 0 10px 30px;
+	}
+
+	#go-to-top {
+		width: 50px;
+		height: 50px;
+		left: auto;
+		right: 15%;
+		bottom: 10%;
+		transform: rotate(0deg);
+	}
+
+	#go-to-top > img {
+		width: inherit;
+		height: inherit;
+	}
 }
