@@ -49,33 +49,33 @@ def pattern_graph():
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
-    per_page = 15  # 每页中包含的事件个数
-    page_num = math.ceil(graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return count(b)').data()[0][
-                             'count(b)'] / per_page)  # 计算总页数，ceil 用于向上取整
-    page = request.args['page']  # get 请求的 url 类似这样：/events_intro?page=1。问号后面的参数会以字典的形式存放在 request.args 中。
-
-    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.name')
-    strdata = []
-    for i in data:
-        strdata.append('S' + str(i['b.name']))
+    PER_PAGE = 15  # 每页中包含的事件个数。常量名约定为全大写
+    page = int(request.args['page'])
+    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag')
+    strdata = [str(i['b.sortflag']) for i in data]
     strdata = list(set(strdata))  # 去重
-    print(strdata)
+    strdata = sorted(strdata, reverse=True)
+    page_num = math.ceil(len(strdata)/PER_PAGE)
+    startnum = (page - 1) * PER_PAGE
+    newstr = strdata[startnum:(startnum+15)]
     events = []
-    for name in strdata:
-        to_search_attributes = ['时间', '出事地点', '航班号', '客机型号', '航空公司']
+    for name in newstr:
         one_info = {}
-        one_info['事件名'] = name
-        for attr in to_search_attributes:
-            event = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (name, attr))
-            for data in event:
-                one_info[attr] = str(data['b.name'])
-        events.append(one_info)
-
-    sort_events = sorted(events, key=lambda keys: keys['时间'], reverse=True)
-    get_events = sort_events[per_page * (page - 1):per_page * (page - 1) + per_page]
-    get_events.append({'page_num': page_num})
-    print(get_events)
-    return jsonify(get_events)  # 使用 flask 自带的 json 打包函数
+        time = str(name)
+        names = ["S" + i['a.name'] for i in graph.run(
+            "match (a) where a.sortflag ='" + time + "' return a.name")]
+        names = list(set(names))
+        to_search_attributes = ['时间', '出事地点', '航班号', '客机型号', '航空公司']
+        for its in names:
+            one_info['事件名'] = its
+            for attr in to_search_attributes:
+                event = graph.run(
+                    'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (its, attr))
+                for data in event:
+                    one_info[attr] = str(data['b.name'])
+            events.append(one_info)
+    events.append({'page_num': page_num})
+    return jsonify(events)   # 使用 flask 自带的 json 打包函数
 
 
 @app.route('/events_intro')
@@ -84,10 +84,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     value = request.args['value']
     events = []
     if key == '事件名称':
-        value = 'S' + value  # 事件名称最好能做下拉列表
-        find_node = graph.run('match (b:' + value + ') return b.name')
-        for data in find_node:
-            events.append(data['b.name'])
+        events.append('S' + value)
     elif key == '时间':
         value = 'T' + value
         event = ''
@@ -109,16 +106,16 @@ def get_events_intro():  # 返回指定属性的事件简介信息
             rnode = graph.run(
                 "match (a) where a.name='" + add + "' match(a)<-[:属性]-(b) return b.name")  # 反向查询事件
             for data in rnode:
-                events.append(data['b.name'])  # 事件名称
+                events.append("S" + data['b.name'])  # 事件名称
         events = list(set(events))  # 去重
     events_info = []
     for event in events:
         one_info = {}
         one_info['事件名'] = event
-        eee = event
-        event = 'S' + str(event)
+        # eee = event
+        # event = 'S' + str(event)
         matcher_event = NodeMatcher(graph)
-        find_event = matcher_event.match(event, name=eee).first()
+        find_event = matcher_event.match(event).first()
         if find_event != None:
             to_search_attributes = ['时间', '出事地点', '航班号', '客机型号', '航空公司']
             for attr in to_search_attributes:
@@ -128,8 +125,8 @@ def get_events_intro():  # 返回指定属性的事件简介信息
                     one_info[attr] = str(data['b.name'])
             events_info.append(one_info)
     num = len(events_info)
-    per_page = 15
-    page_num = math.ceil(num / per_page)  # 计算总页数，ceil 用于向上取整
+    PER_PAGE = 15
+    page_num = math.ceil(num / PER_PAGE)  # 计算总页数，ceil 用于向上取整
     events_info = sorted(
         events_info, key=lambda keys: (keys['时间']), reverse=False)
     events_info.append({'page_num': page_num})
