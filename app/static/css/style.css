@@ -40,6 +40,10 @@
 }
 
 @media (max-width: 993px) {
+	#navbar {
+		z-index: 1;
+	}
+
 	#navbarSupportedContent div {
 		padding: 15px 0 10px 30px;
 	}

@@ -9,9 +9,9 @@ function getCardHTML(item) {
 				alt="${item["客机型号"].trim()}"
 			/>`;
 	}
-	for (let i of ["日期", "出事地点", "航班号", "客机型号", "航空公司"]) {
+	for (let i of ["时间", "出事地点", "航班号", "客机型号", "航空公司"]) {
 		if (item[i])
-			if (i == "日期")
+			if (i == "时间")
 				eventInfoHTML += `
 					<div class="col-6">${i}：</div><div class="col-6">${item[i].slice(0, 4) +
 					"/" +
@@ -26,7 +26,7 @@ function getCardHTML(item) {
 			${aircraftImageHTML}
 			<div class="card-body text-center">
 				<h2 class="card-title"><a class="text-success event-name" data-toggle="modal" data-target="#event-details">${
-					item["事件名"]
+					item["事件名"].slice(1)
 				}</a></h2>
 				<div class="card-text">
 					<div class="row no-gutters">${eventInfoHTML}</div>
@@ -38,17 +38,22 @@ function getCardHTML(item) {
 function showAllEventCards(page, data) {
 	// 显示所有事件卡片
 	page = Number(page);
-	let jsonArray = data;
-	let pageNum = jsonArray[jsonArray.length - 1]["page_num"];
-	jsonArray.pop();
+	let pageNum = data[data.length - 1]["page_num"];
+	data.pop();
 	let toAddHtml = "";
-	jsonArray.forEach(item => {
+	data.forEach(item => {
 		toAddHtml += getCardHTML(item);
 	});
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
 
-	let showButtonNum = 15; // 显示的分页按钮个数
+	let showButtonNum; // 显示的分页按钮个数
+	if (screen.availWidth >= 1200)
+		showButtonNum = 15;
+	else if (screen.availWidth <= 600)
+		showButtonNum = 4;
+	else
+		showButtonNum = 9
 	if (pageNum <= showButtonNum) showButtonNum = pageNum;
 	let pagerButtomHTML = (text, isActive, id = "") => {
 		if (isActive)
@@ -75,8 +80,8 @@ function showAllEventCards(page, data) {
 		addEllipsis = "both";
 	}
 	let toAddPager =
-		pagerButtomHTML("Home", false, "pager-home") +
-		pagerButtomHTML("Prev", false, "pager-previous");
+		pagerButtomHTML("<<", false, "pager-home") +
+		pagerButtomHTML("<", false, "pager-previous");
 	if (addEllipsis === "front" || addEllipsis === "both")
 		toAddPager += pagerButtomHTML("...");
 	for (let i = startButton; i <= endButton; i++) {
@@ -86,13 +91,13 @@ function showAllEventCards(page, data) {
 	if (addEllipsis === "back" || addEllipsis === "both")
 		toAddPager += pagerButtomHTML("...");
 	toAddPager +=
-		pagerButtomHTML("Next", false, "pager-next") +
-		pagerButtomHTML("End", false, "pager-end");
+		pagerButtomHTML(">", false, "pager-next") +
+		pagerButtomHTML(">>", false, "pager-end");
 
 	$("#pager>ul").html(toAddPager);
 	$("#pager li").on("click", obj => {
 		if (
-			["Home", "Previous", "Next", "End", "..."].indexOf(
+			["<<", "<", ">", ">>", "..."].indexOf(
 				obj.target.innerHTML
 			) == -1
 		) {
@@ -143,9 +148,9 @@ function showAllEventCards(page, data) {
 
 function showSearchedEventCards(data) {
 	// 以卡片的形式展示按条件搜索到的事件简介信息
-	let jsonArray = data;
+	data.pop();
 	let toAddHtml = "";
-	jsonArray.forEach(item => {
+	data.forEach(item => {
 		toAddHtml += getCardHTML(item);
 	});
 	$("main>div").html(toAddHtml);
@@ -156,11 +161,10 @@ function showEventDetails(obj) {
 	let title = obj.target.innerHTML;
 	$("#event-details .modal-title").html(title);
 	$("#event-details .modal-body").html(getLoadingHTML("loading-event-details"));
-	$.get(`event_info?event_name=${obj.target.innerHTML}`, data => {
-		let jsonObj = JSON.parse(data);
+	$.get(`event_info?event_name=S${obj.target.innerHTML}`, data => {
 		let toAddHTML = '<table class="table table-striped table-hover"><tbody>';
-		for (let i in jsonObj)
-			toAddHTML += `<tr><th>${i}</th><td>${jsonObj[i]}</td></tr>`;
+		for (let i in data)
+			toAddHTML += `<tr><th>${i}</th><td>${data[i]}</td></tr>`;
 		toAddHTML += "</tbody></table>";
 		$("#event-details .modal-body").html(toAddHTML);
 	});
