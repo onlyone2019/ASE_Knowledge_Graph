@@ -38,10 +38,23 @@ graph = Graph(
 matcher = NodeMatcher(graph)
 
 
+def get_pattern_bottom():
+    result = []
+    find_names = graph.run("match (a:模式) where a.grade=2 return a.name")
+    for data in find_names:
+        s = str(data['a.name'])
+        find_child = graph.run("match (a:模式) where a.name='" + s + "' match (a)-[r]->(b) where exists(b.name) return a.name limit 1")
+        for detail in find_child:
+            result.append(detail['a.name'])
+    result = list(set(result))
+    return result
+
+
 @app.route("/index")
 @app.route("/")
 def index():
-    return render_template("index.html", title='首页', active=1)
+    options = get_pattern_bottom()
+    return render_template("index.html", title='首页', options=options, active=1)
 
 @app.route('/pattern')
 def pattern_graph():
@@ -142,54 +155,11 @@ def get_event_info():  # 根据事件名返回事件所有属性
     event = 'S' + node
     one_info = {}
     one_info['事件名'] = event
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"时间"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['日期'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"出事地点"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['出事地点'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"航班号"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['航班号'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"客机型号"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['客机型号'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"航空公司"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['航空公司'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"起飞地点"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['起飞地点'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"降落地点"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['降落地点'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"事件类型"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['事件类型'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"航线类型"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['航线类型'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"航班类型"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['航班类型'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"天气情况"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['天气情况'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"操作阶段"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['操作阶段'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"原因"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['原因'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"结果"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['结果'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"人员伤亡"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['人员伤亡'] = str(data['b.name'])
-    eventinfo = graph.run('match (a:' + event + ') match (a)-[:属性{name:"等级"}]->(b) return b.name')
-    for data in eventinfo:
-        one_info['等级'] = str(data['b.name'])
+    to_search_attributes = get_pattern_bottom()
+    for attr in to_search_attributes:
+        eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (event, attr))
+        for data in eventinfo:
+            one_info[attr] = str(data['b.name'])
     return jsonify(one_info)
 
 
@@ -257,16 +227,4 @@ def get_reason_participle():  #返回原因的分词
             else:
                 result[detail] += 1
     result = sorted(result.items(), key=lambda x: x[1], reverse=False)
-    return jsonify(result)
-
-@app.route('/pattern_bottom')
-def get_pattern_bottom():
-    result = []
-    find_names = graph.run("match (a:模式) where a.grade=2 return a.name")
-    for data in find_names:
-        s = str(data['a.name'])
-        find_child = graph.run("match (a:模式) where a.name='" + s + "' match (a)-[r]->(b) where exists(b.name) return a.name limit 1")
-        for detail in find_child:
-            result.append(detail['a.name'])
-    result = list(set(result))
     return jsonify(result)

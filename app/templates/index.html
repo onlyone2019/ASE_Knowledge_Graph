@@ -77,6 +77,10 @@
 		text-align: left;
 	}
 
+	#eventDetailsTable th {
+		width: 30%;
+	}
+
 	#pager li, a.event-name {
 		cursor: pointer;
 	}
@@ -135,12 +139,26 @@
 {% block inner_script %}
 <script>
 	window.onload = () => {
-		$('#go-to-top').on('click', goToTop);
+		$('#go-to-top').on('click', goToTop);	// 回到顶部
 
+		/* 下拉框绑定事件 */
+		let oSelect = $("#select-query-basis");
+		oSelect.flag = false;
+		oSelect.on("shown.bs.select", () => {
+			if (!oSelect.flag) {
+				$("#bs-select-1 li").on("click", modifySearchInputElement);
+				oSelect.flag = true;
+			}
+		})
+		/* 下拉框绑定事件 */
+
+		/* 加载事件卡片 */
 		$('#pager>ul').html('')
 		$('main>div').html(getLoadingHTML('loading-events-card'));
 		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
+		/* 加载事件卡片 */
 
+		/* 事件查询 */
 		let search = () => {
 			key = $('aside select').find('option:selected').html()
 			value = $('#search-input').val();
@@ -154,6 +172,7 @@
 		$('#search-button, #search-input').keypress(event => {
 			if (event.keyCode === 13) search();
 		})
+		/* 事件查询 */
 	}
 </script>
 {% endblock %}
@@ -190,24 +209,12 @@
 				class="selectpicker show-tick form-control"
 				data-live-search="true"
 				title="选择查询依据"
+				id="select-query-basis"
 			>
 				<option>事件名称</option>
-				<option>时间</option>
-				<option>客机型号</option>
-				<option>航空公司</option>
-				<option>航班号</option>
-				<option>起飞地点</option>
-				<option>降落地点</option>
-				<option>出事地点</option>
-				<option>事件类型</option>
-				<option>航线类型</option>
-				<option>航班类型</option>
-				<option>天气情况</option>
-				<option>操作阶段</option>
-				<option>直接原因</option>
-				<option>人员伤亡</option>
-				<option>结果</option>
-				<option>等级</option>
+				{% for option in options %}
+						<option>{{ option }}</option>
+				{% endfor %}
 			</select>
 			<button type="button" class="btn btn-block" id="search-button">
 				查询

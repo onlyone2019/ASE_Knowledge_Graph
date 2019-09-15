@@ -1,3 +1,28 @@
+function modifySearchInputElement(obj) {
+	// 根据 查询依据 修改 #search-input
+	queryBasis = obj.currentTarget.querySelector("a > span:last-child").innerHTML;
+	switch (queryBasis) {
+		case "事件名称":
+			$("aside > div").children()[0].remove();
+			$("aside > div").prepend(
+				`<select class="show-tick form-control" id="select-event-name" data-live-search="true" title="选择事件"></select>`
+			);
+			$.get("/event_name", eventNames => {
+				let oSelect = $("#select-event-name");
+				let toAddHTML = "";
+				eventNames.forEach(name => {
+					toAddHTML += `<option>${name}</option>`;
+				});
+				oSelect.html(toAddHTML);
+				oSelect.selectpicker();
+			});
+			break;
+		case "时间":
+			break;
+		default:
+	}
+}
+
 function getCardHTML(item) {
 	let aircraftImageHTML = "";
 	let eventInfoHTML = "";
@@ -25,9 +50,9 @@ function getCardHTML(item) {
 		<div class="card">
 			${aircraftImageHTML}
 			<div class="card-body text-center">
-				<h2 class="card-title"><a class="text-success event-name" data-toggle="modal" data-target="#event-details">${
-					item["事件名"].slice(1)
-				}</a></h2>
+				<h2 class="card-title"><a class="text-success event-name" data-toggle="modal" data-target="#event-details">${item[
+					"事件名"
+				].slice(1)}</a></h2>
 				<div class="card-text">
 					<div class="row no-gutters">${eventInfoHTML}</div>
 				</div>
@@ -48,12 +73,9 @@ function showAllEventCards(page, data) {
 	$("a.event-name").on("click", showEventDetails);
 
 	let showButtonNum; // 显示的分页按钮个数
-	if (screen.availWidth >= 1200)
-		showButtonNum = 15;
-	else if (screen.availWidth <= 600)
-		showButtonNum = 4;
-	else
-		showButtonNum = 9
+	if (screen.availWidth >= 1200) showButtonNum = 15;
+	else if (screen.availWidth <= 600) showButtonNum = 4;
+	else showButtonNum = 9;
 	if (pageNum <= showButtonNum) showButtonNum = pageNum;
 	let pagerButtomHTML = (text, isActive, id = "") => {
 		if (isActive)
@@ -96,11 +118,7 @@ function showAllEventCards(page, data) {
 
 	$("#pager>ul").html(toAddPager);
 	$("#pager li").on("click", obj => {
-		if (
-			["<<", "<", ">", ">>", "..."].indexOf(
-				obj.target.innerHTML
-			) == -1
-		) {
+		if (["<<", "<", ">", ">>", "..."].indexOf(obj.target.innerHTML) == -1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
 			$.get(`/all_events_intro?page=${obj.target.innerHTML}`, data => {
@@ -162,7 +180,8 @@ function showEventDetails(obj) {
 	$("#event-details .modal-title").html(title);
 	$("#event-details .modal-body").html(getLoadingHTML("loading-event-details"));
 	$.get(`event_info?event_name=S${obj.target.innerHTML}`, data => {
-		let toAddHTML = '<table class="table table-striped table-hover"><tbody>';
+		let toAddHTML =
+			'<table class="table table-striped table-hover" id="eventDetailsTable"><tbody>';
 		for (let i in data)
 			toAddHTML += `<tr><th>${i}</th><td>${data[i]}</td></tr>`;
 		toAddHTML += "</tbody></table>";
