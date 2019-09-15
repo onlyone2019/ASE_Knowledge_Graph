@@ -98,17 +98,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     events = []
     if key == '事件名称':
         events.append('S' + value)
-    elif key == '时间':
-        value = 'T' + value
-        event = ''
-        find_node = graph.run('match (b:' + value + ') return b.name')
-        for data in find_node:
-            event = 'T' + data['b.name']
-        rnode = graph.run(
-            'match (a:' + event + ') match(a)<-[:属性]-(b) return b.name')
-        for data in rnode:
-            events.append(data['b.name'])
-    else:
+    elif (key == '原因') | (key == '结果'):
         find_str = "match (a:模式{name:'" + key + "'})  match (b) where b.name=~'.*" + \
                    value + ".*' match(a)-[:包含]->(b) return b.name"
         dnode = graph.run(find_str)
@@ -120,7 +110,12 @@ def get_events_intro():  # 返回指定属性的事件简介信息
                 "match (a) where a.name='" + add + "' match(a)<-[:属性]-(b) return b.name")  # 反向查询事件
             for data in rnode:
                 events.append("S" + data['b.name'])  # 事件名称
-        events = list(set(events))  # 去重
+    else:
+        find_node = graph.run("match (c:模式{name:'" + key + "'}) match(c)-[:包含]->(a) match (a) where a.name='" \
+             + value + "' match (a)<-[:属性]-(b) return b.name")
+        for data in find_node:
+            events.append("S" + data['b.name'])
+    events = list(set(events))  # 去重
     events_info = []
     for event in events:
         one_info = {}
@@ -197,13 +192,18 @@ def get_patt_node():#返回模式结点和边（source:link:target）
     patt_nodes['links']=link
     return jsonify(patt_nodes)
 
-@app.route('/event_name')
-def get_event_name():  #返回所有事件名
-    eventName = []
-    findname = graph.run("match (a:事件名称) match (a)-[:包含]->(b) return b.name")
-    for data in findname:
-        eventName.append(data['b.name'])
-    return jsonify(eventName)
+@app.route('/all_detail')
+def get_all_detail():  #返回所有事件名、航空公司、操作阶段等
+    key = request.args['key']
+    result = []
+    if(key == "事件名"):
+        find_details = graph.run("match (a:事件名称) match (a)-[:包含]->(b) return b.name")
+    else:
+        find_details = graph.run("match (a:模式{name:'%s'}) match (a)-[:包含]->(b) return b.name" % key)
+    for data in find_details:
+        result.append(data['b.name'])
+    result = list(set(result))
+    return jsonify(result)
 
 @app.route('/pattern_details')
 def get_pattern_details():  #返回模式图下的具体数据节点
