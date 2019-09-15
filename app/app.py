@@ -196,7 +196,7 @@ def get_patt_node():#返回模式结点和边（source:link:target）
 def get_all_detail():  #返回所有事件名、航空公司、操作阶段等
     key = request.args['key']
     result = []
-    if(key == "事件名"):
+    if(key == "事件名称"):
         find_details = graph.run("match (a:事件名称) match (a)-[:包含]->(b) return b.name")
     else:
         find_details = graph.run("match (a:模式{name:'%s'}) match (a)-[:包含]->(b) return b.name" % key)

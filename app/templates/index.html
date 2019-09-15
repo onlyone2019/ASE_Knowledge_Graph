@@ -43,7 +43,15 @@
 		padding: 70px 40px 30px 40px;
 	}
 
-	aside > div > div {
+	aside > div > div:nth-child(1) {
+		border: 1px #CED4DA solid !important;
+	}
+
+	aside > div > div:nth-child(1) > button {
+		background-color: white !important;
+	}
+
+	aside > div > div:nth-child(2) {
 		margin-top: 5px;
 	}
 
@@ -141,7 +149,7 @@
 	window.onload = () => {
 		$('#go-to-top').on('click', goToTop);	// 回到顶部
 
-		/* 下拉框绑定事件 */
+		/* 下拉框绑定单击事件 */
 		let oSelect = $("#select-query-basis");
 		oSelect.flag = false;
 		oSelect.on("shown.bs.select", () => {
@@ -150,7 +158,7 @@
 				oSelect.flag = true;
 			}
 		})
-		/* 下拉框绑定事件 */
+		/* 下拉框绑定单击事件 */
 
 		/* 加载事件卡片 */
 		$('#pager>ul').html('')
@@ -158,21 +166,7 @@
 		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
 		/* 加载事件卡片 */
 
-		/* 事件查询 */
-		let search = () => {
-			key = $('aside select').find('option:selected').html()
-			value = $('#search-input').val();
-			if (key && value) {
-				$('#pager>ul').html('')
-				$('main>div').html(getLoadingHTML("loading-events-card"));
-				$.get(`/events_intro?key=${key}&value=${value}`, data => { showSearchedEventCards(data) })
-			}
-		}
-		$('#search-button').on('click', search);
-		$('#search-button, #search-input').keypress(event => {
-			if (event.keyCode === 13) search();
-		})
-		/* 事件查询 */
+		$('#search-button').on('click', search);	// 搜索按钮绑定单击事件
 	}
 </script>
 {% endblock %}
@@ -213,7 +207,9 @@
 			>
 				<option>事件名称</option>
 				{% for option in options %}
+					{% if option != "人员伤亡" %}
 						<option>{{ option }}</option>
+					{% endif %}
 				{% endfor %}
 			</select>
 			<button type="button" class="btn btn-block" id="search-button">

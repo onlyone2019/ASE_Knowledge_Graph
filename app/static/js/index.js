@@ -1,26 +1,69 @@
+function search() {
+	let key = $("#select-query-basis")
+		.find("option:selected")
+		.html();
+	let value = "";
+	if (key === "时间")
+		value = $("#search-input")
+			.val()
+			.split("/")
+			.join("");
+	else if (key === "原因" || key === "结果") value = $("#search-input").val();
+	else
+		value = $("#select-attr-value")
+			.find("option:selected")
+			.html();
+	if (key && value) {
+		$("#pager>ul").html("");
+		$("main>div").html(getLoadingHTML("loading-events-card"));
+		$.get(`/events_intro?key=${key}&value=${value}`, data => {
+			showSearchedEventCards(data);
+		});
+	}
+}
+
 function modifySearchInputElement(obj) {
 	// 根据 查询依据 修改 #search-input
-	queryBasis = obj.currentTarget.querySelector("a > span:last-child").innerHTML;
-	switch (queryBasis) {
-		case "事件名称":
-			$("aside > div").children()[0].remove();
+	setTimeout(() => {
+		queryBasis = obj.currentTarget.querySelector("a > span:last-child")
+			.innerHTML;
+
+		$("aside > div")
+			.children()[0]
+			.remove();
+		if (queryBasis === "时间") {
 			$("aside > div").prepend(
-				`<select class="show-tick form-control" id="select-event-name" data-live-search="true" title="选择事件"></select>`
+				'<input type="search" id="search-input" class="form-control" placeholder="示例：2017/08/26" />'
 			);
-			$.get("/event_name", eventNames => {
-				let oSelect = $("#select-event-name");
+			$("#search-input").keypress(event => {
+				if (event.keyCode === 13) search();
+			});
+		} else if (queryBasis === "原因" || queryBasis === "结果") {
+			$("aside > div").prepend(
+				'<input type="search" id="search-input" class="form-control" placeholder="输入关键词以查询" />'
+			);
+			$("#search-input").keypress(event => {
+				if (event.keyCode === 13) search();
+			});
+		}
+		else {
+			$("aside > div").prepend(
+				`<select class="show-tick form-control" id="select-attr-value" data-live-search="true" title="选择${queryBasis}"></select>`
+			);
+			let key = $("#select-query-basis")
+				.find("option:selected")
+				.html();
+			$.get(`/all_detail?key=${key}`, data => {
+				let oSelect = $("#select-attr-value");
 				let toAddHTML = "";
-				eventNames.forEach(name => {
-					toAddHTML += `<option>${name}</option>`;
+				data.forEach(item => {
+					toAddHTML += `<option>${item}</option>`;
 				});
 				oSelect.html(toAddHTML);
 				oSelect.selectpicker();
 			});
-			break;
-		case "时间":
-			break;
-		default:
-	}
+		}
+	}, 1); // 让 modifySearchInputElement 事件在 bootstrap-select 指定的事件后面触发
 }
 
 function getCardHTML(item) {
