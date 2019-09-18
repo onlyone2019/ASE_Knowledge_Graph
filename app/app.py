@@ -64,19 +64,17 @@ def pattern_graph():
 def get_all_events_intro():  # 返回page页事件的简介信息
     PER_PAGE = 15  # 每页中包含的事件个数。常量名约定为全大写
     page = int(request.args['page'])
-    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag')
+    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag order by b.sortflag desc')
     strdata = [str(i['b.sortflag']) for i in data]
-    strdata = list(set(strdata))  # 去重
-    strdata = sorted(strdata, reverse=True)
     page_num = math.ceil(len(strdata)/PER_PAGE)
     startnum = (page - 1) * PER_PAGE
-    newstr = strdata[startnum:(startnum+15)]
+    newstr = strdata[startnum: (startnum + 15)]
     events = []
     for name in newstr:
         one_info = {}
-        time = str(name)
+        flag = str(name)
         names = ["S" + i['a.name'] for i in graph.run(
-            "match (a) where a.sortflag ='" + time + "' return a.name")]
+            "match (a) where a.sortflag ='" + flag + "' return a.name")]
         names = list(set(names))
         to_search_attributes = ['时间', '出事地点', '航班号', '客机型号', '航空公司']
         for its in names:
