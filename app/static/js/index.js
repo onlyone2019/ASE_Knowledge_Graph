@@ -45,8 +45,7 @@ function modifySearchInputElement(obj) {
 			$("#search-input").keypress(event => {
 				if (event.keyCode === 13) search();
 			});
-		}
-		else {
+		} else {
 			$("aside > div").prepend(
 				`<select class="show-tick form-control" id="select-attr-value" data-live-search="true" title="选择${queryBasis}"></select>`
 			);
@@ -108,16 +107,24 @@ function showAllEventCards(page, data) {
 	page = Number(page);
 	let pageNum = data[data.length - 1]["page_num"];
 	data.pop();
+
 	let toAddHtml = "";
-	data.forEach(item => {
-		toAddHtml += getCardHTML(item);
-	});
+	const numPerRow = 3;	// 每行的卡片个数
+	let rowNum = Math.ceil(data.length / numPerRow);
+	for (let i = 0; i < rowNum; i++) {
+		toAddHtml += '<div class="card-columns">';
+		for (let j = 0; j < numPerRow; j++)
+			if (data[i * numPerRow + j])
+				toAddHtml += getCardHTML(data[i * numPerRow + j]);
+		toAddHtml += "</div>";
+	}
+
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
 
 	let showButtonNum; // 显示的分页按钮个数
 	if (screen.availWidth >= 1200) showButtonNum = 15;
-	else if (screen.availWidth <= 600) showButtonNum = 4;
+	else if (screen.availWidth <= 575) showButtonNum = 4;
 	else showButtonNum = 9;
 	if (pageNum <= showButtonNum) showButtonNum = pageNum;
 	let pagerButtomHTML = (text, isActive, id = "") => {
@@ -211,9 +218,15 @@ function showSearchedEventCards(data) {
 	// 以卡片的形式展示按条件搜索到的事件简介信息
 	data.pop();
 	let toAddHtml = "";
-	data.forEach(item => {
-		toAddHtml += getCardHTML(item);
-	});
+	const numPerRow = 3;	// 每行的卡片个数
+	let rowNum = Math.ceil(data.length / numPerRow);
+	for (let i = 0; i < rowNum; i++) {
+		toAddHtml += '<div class="card-columns">';
+		for (let j = 0; j < numPerRow; j++)
+			if (data[i * numPerRow + j])
+				toAddHtml += getCardHTML(data[i * numPerRow + j]);
+		toAddHtml += "</div>";
+	}
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
 }

@@ -71,7 +71,7 @@
 		min-height: 100%;
 	}
 
-	main > div {
+	main > div.event-card {
 		margin-top: 66px;
 		padding: 50px 70px 30px 70px;
 	}
@@ -219,7 +219,7 @@
 	</aside>
 	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
 	<main>
-		<div class="card-columns"></div>
+		<div class="event-card"></div>
 		<nav id="pager">
 			<ul class="pagination justify-content-center"></ul>
 		</nav>
