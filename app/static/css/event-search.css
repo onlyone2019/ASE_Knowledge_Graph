@@ -1,0 +1,122 @@
+#event-details .modal-title {
+	text-align: center;
+	width: 100%;
+	margin: 10px 0;
+}
+
+#event-details .modal-body {
+	margin: 20px 40px;
+}
+
+aside {
+	background-color: #f7f9fc;
+	min-height: 100%;
+	width: 25%;
+	position: fixed;
+	margin-top: 66px;
+}
+
+aside > div {
+	padding: 70px 40px 30px 40px;
+}
+
+aside > div > div:nth-child(1) {
+	border: 1px #ced4da solid !important;
+}
+
+aside > div > div:nth-child(1) > button {
+	background-color: white !important;
+}
+
+aside > div > div:nth-child(2) {
+	margin-top: 5px;
+}
+
+#search-button {
+	margin-top: 30px;
+	border-color: #007bff;
+}
+
+#search-button:hover {
+	box-shadow: 0 0 0 3px #b9d9fd;
+}
+
+main {
+	width: 75%;
+	position: absolute;
+	right: 0;
+	min-height: 100%;
+}
+
+main > div.event-card {
+	margin-top: 66px;
+	padding: 50px 70px 30px 70px;
+}
+
+div.card-body .row > div:nth-child(odd) {
+	text-align: right;
+	font-weight: bold;
+}
+
+div.card-body .row > div:nth-child(even) {
+	text-align: left;
+}
+
+#eventDetailsTable th {
+	width: 30%;
+}
+
+#pager li,
+a.event-name {
+	cursor: pointer;
+}
+
+#loading-events-card {
+	position: absolute;
+	right: 50%;
+	top: 50%;
+	bottom: 50%;
+}
+
+#loading-event-details {
+	text-align: center;
+}
+
+#loading-events-card > span,
+#loading-event-details > span {
+	position: relative;
+	bottom: 7px;
+	left: 10px;
+}
+
+@media (max-width: 993px) {
+	aside {
+		background-color: #343a40;
+		width: 100vw;
+		min-height: 0;
+		display: none;
+		margin-top: 170px;
+		z-index: 1;
+	}
+
+	aside > div {
+		padding: 20px 40px;
+	}
+
+	#search-button {
+		color: white;
+		border-color: white;
+	}
+
+	main {
+		width: 100%;
+	}
+
+	main > div {
+		padding: 40px 50px;
+	}
+
+	#loading-events-card {
+		right: 40%;
+	}
+}

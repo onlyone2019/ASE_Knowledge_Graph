@@ -53,12 +53,16 @@ def get_pattern_bottom():
 @app.route("/index")
 @app.route("/")
 def index():
+    return render_template("index.html", title='首页', active=1)
+
+@app.route("/event_search")
+def event_search():
     options = get_pattern_bottom()
-    return render_template("index.html", title='首页', options=options, active=1)
+    return render_template("event-search.html", title="事件检索", options=options, active=2)
 
 @app.route('/pattern')
 def pattern_graph():
-    return render_template("pattern.html", title='模式图', active=2)
+    return render_template("pattern.html", title='模式图', active=3)
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息

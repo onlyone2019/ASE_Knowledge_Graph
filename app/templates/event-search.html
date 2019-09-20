@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block outer_css %}
+<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/general.css') }}"
+/>
+<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/event-search.css') }}"
+/>
+<link
+	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
+	rel="stylesheet"
+/>
+{% endblock %}
+
+{% block outer_script %}
+<script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
+<script src="{{ url_for('static', filename='js/general.js') }}"></script>
+<script src="{{ url_for('static', filename='js/event-search.js') }}"></script>
+{% endblock %}
+
+{% block inner_script %}
+<script>
+	window.onload = () => {
+		$('#go-to-top').on('click', goToTop);	// 回到顶部
+
+		/* 下拉框绑定单击事件 */
+		let oSelect = $("#select-query-basis");
+		oSelect.flag = false;
+		oSelect.on("shown.bs.select", () => {
+			if (!oSelect.flag) {
+				$("#bs-select-1 li").on("click", modifySearchInputElement);
+				oSelect.flag = true;
+			}
+		})
+		/* 下拉框绑定单击事件 */
+
+		/* 加载事件卡片 */
+		$('#pager>ul').html('')
+		$('main>div').html(getLoadingHTML('loading-events-card'));
+		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
+		/* 加载事件卡片 */
+
+		$('#search-button').on('click', search);	// 搜索按钮绑定单击事件
+	}
+</script>
+{% endblock %}
+
+{% block main_content %}
+	{% include "include/navbar.html" %}
+	<div class="modal fade" id="event-details" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title text-primary"></h1>
+					<button
+						type="button"
+						class="close"
+						data-dismiss="modal"
+					>
+						<span>&times;</span>
+					</button>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						关闭
+					</button>
+					<button type="button" class="btn btn-primary">查看源文档</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<aside>
+		<div>
+			<input type="search" id="search-input" class="form-control" placeholder="search..." />
+			<select
+				class="selectpicker show-tick form-control"
+				data-live-search="true"
+				title="选择查询依据"
+				id="select-query-basis"
+			>
+				<option>事件名称</option>
+				{% for option in options %}
+					{% if option != "人员伤亡" %}
+						<option>{{ option }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+			<button type="button" class="btn btn-block" id="search-button">
+				查询
+			</button>
+		</div>
+	</aside>
+	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
+	<main>
+		<div class="event-card"></div>
+		<nav id="pager">
+			<ul class="pagination justify-content-center"></ul>
+		</nav>
+	</main>
+{% endblock %}

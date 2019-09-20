@@ -5,223 +5,74 @@
 {% block outer_css %}
 <link
 	rel="stylesheet"
-	href="{{ url_for('static', filename='css/style.css') }}"
+	href="{{ url_for('static', filename='css/general.css') }}"
 />
-<link
-	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
-	rel="stylesheet"
-/>
-{% endblock %}
-
-{% block outer_script %}
-<script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
 
 {% block inner_css %}
 <style>
-	#event-details .modal-title {
-		text-align: center;
-		width: 100%;
-		margin: 10px 0;
-	}
-
-	#event-details .modal-body {
-		margin: 20px 40px;
-	}
-
-	aside {
-		background-color: #f7f9fc;
-		min-height: 100%;
-		width: 25%;
-		position: fixed;
-		margin-top: 66px;
-	}
-
-	aside > div {
-		padding: 70px 40px 30px 40px;
-	}
-
-	aside > div > div:nth-child(1) {
-		border: 1px #CED4DA solid !important;
-	}
-
-	aside > div > div:nth-child(1) > button {
-		background-color: white !important;
-	}
-
-	aside > div > div:nth-child(2) {
-		margin-top: 5px;
-	}
-
-	#search-button {
-		margin-top: 30px;
-		border-color: #007bff;
-	}
-
-	#search-button:hover {
-		box-shadow: 0 0 0 3px #B9D9FD;
-	}
-
-	main {
-		width: 75%;
-		position: absolute;
-		right: 0;
-		min-height: 100%;
-	}
-
-	main > div.event-card {
-		margin-top: 66px;
-		padding: 50px 70px 30px 70px;
-	}
-
-	div.card-body .row > div:nth-child(odd) {
-		text-align: right;
-		font-weight: bold;
-	}
-
-	div.card-body .row > div:nth-child(even) {
-		text-align: left;
-	}
-
-	#eventDetailsTable th {
-		width: 30%;
-	}
-
-	#pager li, a.event-name {
-		cursor: pointer;
-	}
-
-	#loading-events-card {
-		position: absolute;
-		right: 50%;
-		top: 50%;
-		bottom: 50%;
-	}
-
-	#loading-event-details {
-		text-align: center;
-	}
-
-	#loading-events-card > span, #loading-event-details > span {
-		position: relative;
-		bottom: 7px;
-		left: 10px;
+	#carousel-map {
+		margin: 66px auto 0 auto;
+		width: 70%;
 	}
 
 	@media (max-width: 993px) {
-		aside {
-			background-color: #343A40;
-			width: 100vw;
-			min-height: 0;
-			display: none;
-			margin-top: 170px;
-			z-index: 1;
-		}
-
-		aside > div {
-			padding: 20px 40px;
-		}
-
-		#search-button {
-			color: white;
-			border-color: white;
-		}
-
-		main {
+		#carousel-map {
+			margin: 66px auto 0 auto;
 			width: 100%;
-		}
-
-		main > div {
-			padding: 40px 50px;
-		}
-
-		#loading-events-card {
-			right: 40%;
 		}
 	}
 </style>
 {% endblock %}
 
-{% block inner_script %}
-<script>
-	window.onload = () => {
-		$('#go-to-top').on('click', goToTop);	// 回到顶部
-
-		/* 下拉框绑定单击事件 */
-		let oSelect = $("#select-query-basis");
-		oSelect.flag = false;
-		oSelect.on("shown.bs.select", () => {
-			if (!oSelect.flag) {
-				$("#bs-select-1 li").on("click", modifySearchInputElement);
-				oSelect.flag = true;
-			}
-		})
-		/* 下拉框绑定单击事件 */
-
-		/* 加载事件卡片 */
-		$('#pager>ul').html('')
-		$('main>div').html(getLoadingHTML('loading-events-card'));
-		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
-		/* 加载事件卡片 */
-
-		$('#search-button').on('click', search);	// 搜索按钮绑定单击事件
-	}
-</script>
-{% endblock %}
-
 {% block main_content %}
 	{% include "include/navbar.html" %}
-	<div class="modal fade" id="event-details" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title text-primary"></h1>
-					<button
-						type="button"
-						class="close"
-						data-dismiss="modal"
-					>
-						<span>&times;</span>
-					</button>
-				</div>
-				<div class="modal-body"></div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">
-						关闭
-					</button>
-					<button type="button" class="btn btn-primary">查看源文档</button>
-				</div>
+	<div id="carousel-map" class="carousel slide" data-ride="carousel">
+		<div class="carousel-inner">
+			<div class="carousel-item active">
+				<img
+					src="{{ url_for('static', filename='images/slide1.jpg') }}"
+					class="d-block w-100"
+					alt="slide1"
+				/>
+			</div>
+			<div class="carousel-item">
+				<img
+					src="{{ url_for('static', filename='images/slide2.jpg') }}"
+					class="d-block w-100"
+					alt="slide2"
+				/>
+			</div>
+			<div class="carousel-item">
+				<img
+					src="{{ url_for('static', filename='images/slide3.jpg') }}"
+					class="d-block w-100"
+					alt="slide3"
+				/>
+			</div>
+			<div class="carousel-item">
+				<img
+					src="{{ url_for('static', filename='images/slide4.jpg') }}"
+					class="d-block w-100"
+					alt="slide4"
+				/>
 			</div>
 		</div>
+		<a
+			class="carousel-control-prev"
+			href="#carousel-map"
+			role="button"
+			data-slide="prev"
+		>
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+		</a>
+		<a
+			class="carousel-control-next"
+			href="#carousel-map"
+			role="button"
+			data-slide="next"
+		>
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+		</a>
 	</div>
-	<aside>
-		<div>
-			<input type="search" id="search-input" class="form-control" placeholder="search..." />
-			<select
-				class="selectpicker show-tick form-control"
-				data-live-search="true"
-				title="选择查询依据"
-				id="select-query-basis"
-			>
-				<option>事件名称</option>
-				{% for option in options %}
-					{% if option != "人员伤亡" %}
-						<option>{{ option }}</option>
-					{% endif %}
-				{% endfor %}
-			</select>
-			<button type="button" class="btn btn-block" id="search-button">
-				查询
-			</button>
-		</div>
-	</aside>
-	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
-	<main>
-		<div class="event-card"></div>
-		<nav id="pager">
-			<ul class="pagination justify-content-center"></ul>
-		</nav>
-	</main>
 {% endblock %}
