@@ -98,6 +98,8 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     key = request.args['key']
     value = request.args['value']
     events = []
+    page=request.args['page']
+    PER_PAGE = 15
     if key == '事件名称':
         events.append('S' + value)
     elif (key == '原因') | (key == '结果'):
@@ -118,12 +120,14 @@ def get_events_intro():  # 返回指定属性的事件简介信息
         for data in find_node:
             events.append("S" + data['b.name'])
     events = list(set(events))  # 去重
+    num=len(events)
+    page_num = math.ceil(num / PER_PAGE)
+    startnum = (page - 1) * PER_PAGE
     events_info = []
+    events=events[startnum:startnum+PER_PAGE]
     for event in events:
         one_info = {}
         one_info['事件名'] = event
-        # eee = event
-        # event = 'S' + str(event)
         matcher_event = NodeMatcher(graph)
         find_event = matcher_event.match(event).first()
         if find_event != None:
@@ -134,12 +138,10 @@ def get_events_intro():  # 返回指定属性的事件简介信息
                 for data in eventinfo:
                     one_info[attr] = str(data['b.name'])
             events_info.append(one_info)
-    num = len(events_info)
-    PER_PAGE = 15
-    page_num = math.ceil(num / PER_PAGE)  # 计算总页数，ceil 用于向上取整
     events_info = sorted(
         events_info, key=lambda keys: (keys['时间']), reverse=False)
     events_info.append({'page_num': page_num})
+    print(events_info)
     return jsonify(events_info)
 
 @app.route('/event_info')
