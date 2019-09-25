@@ -16,8 +16,8 @@ function search() {
 	if (key && value) {
 		$("#pager>ul").html("");
 		$("main>div").html(getLoadingHTML("loading-events-card"));
-		$.get(`/events_intro?key=${key}&value=${value}`, data => {
-			showSearchedEventCards(data);
+		$.get(`/events_intro?key=${key}&value=${value}&page=1`, data => {
+			showSearchedEventCards(1, data, key, value);
 		});
 	}
 }
@@ -109,7 +109,7 @@ function showAllEventCards(page, data) {
 	data.pop();
 
 	let toAddHtml = "";
-	const numPerRow = 3;	// 每行的卡片个数
+	const numPerRow = 3; // 每行的卡片个数
 	let rowNum = Math.ceil(data.length / numPerRow);
 	for (let i = 0; i < rowNum; i++) {
 		toAddHtml += '<div class="card-columns">';
@@ -122,6 +122,37 @@ function showAllEventCards(page, data) {
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
 
+	renderPager(page, pageNum, "/all_events_intro?page=", showAllEventCards);
+}
+
+function showSearchedEventCards(page, data, key, value) {
+	// 以卡片的形式展示按条件搜索到的事件简介信息
+	page = Number(page);
+	let pageNum = data[data.length - 1]["page_num"];
+	data.pop();
+
+	let toAddHtml = "";
+	const numPerRow = 3; // 每行的卡片个数
+	let rowNum = Math.ceil(data.length / numPerRow);
+	for (let i = 0; i < rowNum; i++) {
+		toAddHtml += '<div class="card-columns">';
+		for (let j = 0; j < numPerRow; j++)
+			if (data[i * numPerRow + j])
+				toAddHtml += getCardHTML(data[i * numPerRow + j]);
+		toAddHtml += "</div>";
+	}
+	$("main>div").html(toAddHtml);
+	$("a.event-name").on("click", showEventDetails);
+
+	renderPager(
+		page,
+		pageNum,
+		`/events_intro?key=${key}&value=${value}&page=`,
+		showSearchedEventCards
+	);
+}
+
+function renderPager(page, pageNum, url, clickCallback) {
 	let showButtonNum; // 显示的分页按钮个数
 	if (screen.availWidth >= 1200) showButtonNum = 15;
 	else if (screen.availWidth <= 575) showButtonNum = 4;
@@ -168,11 +199,28 @@ function showAllEventCards(page, data) {
 
 	$("#pager>ul").html(toAddPager);
 	$("#pager li").on("click", obj => {
-		if (["<<", "<", ">", ">>", "..."].indexOf(obj.target.innerHTML) == -1) {
+		if (
+			[
+				"<<",
+				"<",
+				">",
+				">>",
+				"...",
+				"&lt;",
+				"&lt;&lt;",
+				"&gt;",
+				"&gt;&gt;"
+			].indexOf(obj.target.innerHTML) == -1
+		) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
-			$.get(`/all_events_intro?page=${obj.target.innerHTML}`, data => {
-				showAllEventCards(obj.target.innerHTML, data);
+			$.get(url + obj.target.innerHTML, data => {
+				clickCallback(
+					obj.target.innerHTML,
+					data,
+					/(?<=key=).*?(?=&)/.exec(url)[0],
+					/(?<=value=).*?(?=&)/.exec(url)[0]
+				);
 			});
 		}
 	});
@@ -180,8 +228,13 @@ function showAllEventCards(page, data) {
 		if (page > 1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
-			$.get(`/all_events_intro?page=${page - 1}`, data => {
-				showAllEventCards(page - 1, data);
+			$.get(url + (page - 1), data => {
+				clickCallback(
+					page - 1,
+					data,
+					/(?<=key=).*?(?=&)/.exec(url)[0],
+					/(?<=value=).*?(?=&)/.exec(url)[0]
+				);
 			});
 		}
 	});
@@ -189,8 +242,13 @@ function showAllEventCards(page, data) {
 		if (page < pageNum) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
-			$.get(`/all_events_intro?page=${page + 1}`, data => {
-				showAllEventCards(page + 1, data);
+			$.get(url + (page + 1), data => {
+				clickCallback(
+					page + 1,
+					data,
+					/(?<=key=).*?(?=&)/.exec(url)[0],
+					/(?<=value=).*?(?=&)/.exec(url)[0]
+				);
 			});
 		}
 	});
@@ -198,8 +256,13 @@ function showAllEventCards(page, data) {
 		if (page != 1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
-			$.get(`/all_events_intro?page=${1}`, data => {
-				showAllEventCards(1, data);
+			$.get(url + 1, data => {
+				clickCallback(
+					1,
+					data,
+					/(?<=key=).*?(?=&)/.exec(url)[0],
+					/(?<=value=).*?(?=&)/.exec(url)[0]
+				);
 			});
 		}
 	});
@@ -207,28 +270,16 @@ function showAllEventCards(page, data) {
 		if (page != pageNum) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
 			$("#pager>ul").html("");
-			$.get(`/all_events_intro?page=${pageNum}`, data => {
-				showAllEventCards(pageNum, data);
+			$.get(url + pageNum, data => {
+				clickCallback(
+					pageNum,
+					data,
+					/(?<=key=).*?(?=&)/.exec(url)[0], // 只有 showSearchedEventCards 函数才会用到后面两个参数
+					/(?<=value=).*?(?=&)/.exec(url)[0]
+				);
 			});
 		}
 	});
-}
-
-function showSearchedEventCards(data) {
-	// 以卡片的形式展示按条件搜索到的事件简介信息
-	data.pop();
-	let toAddHtml = "";
-	const numPerRow = 3;	// 每行的卡片个数
-	let rowNum = Math.ceil(data.length / numPerRow);
-	for (let i = 0; i < rowNum; i++) {
-		toAddHtml += '<div class="card-columns">';
-		for (let j = 0; j < numPerRow; j++)
-			if (data[i * numPerRow + j])
-				toAddHtml += getCardHTML(data[i * numPerRow + j]);
-		toAddHtml += "</div>";
-	}
-	$("main>div").html(toAddHtml);
-	$("a.event-name").on("click", showEventDetails);
 }
 
 function showEventDetails(obj) {

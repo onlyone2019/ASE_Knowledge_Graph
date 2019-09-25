@@ -122,7 +122,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     events = list(set(events))  # 去重
     num=len(events)
     page_num = math.ceil(num / PER_PAGE)
-    startnum = (page - 1) * PER_PAGE
+    startnum = (int(page) - 1) * PER_PAGE
     events_info = []
     events=events[startnum:startnum+PER_PAGE]
     for event in events:
@@ -141,7 +141,6 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     events_info = sorted(
         events_info, key=lambda keys: (keys['时间']), reverse=False)
     events_info.append({'page_num': page_num})
-    print(events_info)
     return jsonify(events_info)
 
 @app.route('/event_info')
