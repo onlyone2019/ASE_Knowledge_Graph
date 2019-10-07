@@ -1,0 +1,119 @@
+/* left */
+.left {
+	width: 49%;
+	height: 100vh;
+	float: left;
+	background: url("../images/bkg-image.svg");
+	background-size: cover;
+}
+
+.carousel-item {
+	height: 100vh;
+	color: white;
+	padding: 150px 100px;
+}
+
+.carousel-item p {
+	font-size: 1.7em;
+	margin-top: 80px;
+	margin-bottom: 50px;
+}
+
+.carousel-item a {
+	color: white;
+	border: 2px solid white;
+	font-size: 1.2em;
+	padding: 10px 20px;
+	transition: all 0.5s;
+}
+
+.carousel-item a:hover {
+	background: white;
+	color: black;
+}
+/* left */
+
+/* right */
+.right {
+	width: 51%;
+	height: 100vh;
+	float: right;
+}
+
+.wrapper {
+	text-align: center;
+	margin: auto 50px;
+	position: absolute;
+	top: 50%;
+	transform: translate(0, -50%);
+}
+
+.wrapper > h1 {
+	font-weight: bold;
+	margin-bottom: 50px;
+}
+
+.functions {
+	list-style: none;
+}
+
+.functions > li {
+	display: inline-block;
+	width: 120px;
+	margin: 20px 40px;
+}
+
+.functions div {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	border: 2px solid #3ca5f6;
+	overflow: hidden;
+	transition: all 0.3s;
+}
+
+.functions img {
+	width: 70px;
+	height: 70px;
+	margin-top: 20px;
+	position: relative;
+	top: 0;
+	transition: all 0.3s;
+}
+
+.functions img:last-child {
+	margin-top: 30px;
+}
+
+.functions h5 {
+	margin-top: 10px;
+	text-align: center;
+	font-size: 1.1em;
+}
+
+.functions li:hover {
+	cursor: pointer;
+}
+
+.functions li:hover div {
+	background-color: #3ca5f6;
+}
+
+.functions li:hover img {
+	top: -100px;
+}
+
+.functions li:hover h5 {
+	color: #3ca5f6;
+}
+
+.smaller-img img {
+	width: 60px;
+	height: 60px;
+	margin-top: 30px;
+}
+
+.smaller-img img:last-child {
+	margin-top: 40px;
+}
+/* right */
