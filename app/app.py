@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify
 from py2neo import Graph, Node, Relationship, NodeMatcher
+from flask_scss import Scss
 import math
 import re
 import os
@@ -28,6 +29,7 @@ class Config:
 app = Flask(__name__)
 config = Config()
 app.config.from_object(config)
+Scss(app, static_dir='app/static/css', asset_dir='app/static/scss')
 
 # 连接neo4j
 graph = Graph(

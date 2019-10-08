@@ -14,6 +14,7 @@ jieba = "*"
 flask-mail = "*"
 flask-wtf = "*"
 flask-login = "*"
+flask-scss = "*"
 
 [requires]
 python_version = "3.7"

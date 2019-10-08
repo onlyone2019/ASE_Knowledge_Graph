@@ -1,81 +1,64 @@
 * {
-	margin: 0;
-	padding: 0;
-}
+  margin: 0;
+  padding: 0; }
 
-button {
-	cursor: pointer;
-}
+  button {
+    cursor: pointer; }
 
-a {
-	color: black;
-}
-
-a:hover {
-	text-decoration: none;
-}
+    a {
+      color: black; }
+      a:hover {
+        text-decoration: none; }
 
 #brand {
-	margin-right: 40px;
-	margin-left: 10px;
-}
-
-#brand > img {
-	height: 40px;
-	margin-right: 5px;
-}
+  margin-right: 40px;
+  margin-left: 10px; }
+  #brand > img {
+    height: 40px;
+    margin-right: 5px; }
 
 #go-to-top {
-	background-color: white;
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	position: fixed;
-	left: 10%;
-	bottom: 70px;
-	transform: rotate(180deg);
-	transition: transform 0.5s;
-	z-index: 10;
-	cursor: pointer;
+  background-color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: fixed;
+  left: 10%;
+  bottom: 70px;
+  transform: rotate(180deg);
+  transition: transform 0.5s;
+  z-index: 10;
+  cursor: pointer; }
+  #go-to-top:hover {
+    transform: rotate(0deg); }
+    #go-to-top > img {
+      width: 60px;
+      height: 60px; }
+      @media screen and (max-width: 993px) {
+        #go-to-top > img {
+          width: inherit;
+          height: inherit;   }
 }
-
-#go-to-top:hover {
-	transform: rotate(0deg);
-}
-
-#go-to-top > img {
-	width: 60px;
-	height: 60px;
+  @media screen and (max-width: 993px) {
+    #go-to-top {
+      width: 50px;
+      height: 50px;
+      left: auto;
+      right: 15%;
+      bottom: 10%;
+      transform: rotate(0deg);   }
 }
 
 .no-transition {
-	-webkit-transition: height 0.01s;
-	-moz-transition: height 0.01s;
-	-ms-transition: height 0.01s;
-	-o-transition: height 0.01s;
-	transition: height 0.01s;
-}
+  -webkit-transition: height 0.01s;
+  -moz-transition: height 0.01s;
+  -ms-transition: height 0.01s;
+  -o-transition: height 0.01s;
+  transition: height 0.01s; }
 
-@media (max-width: 993px) {
-	#navbar {
-		z-index: 1;
-	}
-
-	#navbarSupportedContent div {
-		padding: 15px 0 10px 30px;
-	}
-
-	#go-to-top {
-		width: 50px;
-		height: 50px;
-		left: auto;
-		right: 15%;
-		bottom: 10%;
-		transform: rotate(0deg);
-	}
-
-	#go-to-top > img {
-		width: inherit;
-		height: inherit;
-	}
+  @media screen and (max-width: 993px) {
+    #navbar {
+      z-index: 1;   }
+      #navbar #navbarSupportedContent div {
+        padding: 15px 0 10px 30px;   }
 }
