@@ -233,3 +233,25 @@ def get_reason_participle():  #返回原因的分词
                 result[detail] += 1
     result = sorted(result.items(), key=lambda x: x[1], reverse=False)
     return jsonify(result)
+
+@app.route('/some_event')
+def get_some_event():
+    result = []
+    to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点', '出事地点', '事件类型', '航线类型','航班类型','天气情况','操作阶段','原因','人员伤亡','结果','等级']
+    find_names = graph.run("match(a:事件名称) match (a)-[:包含]->(b) return b.name limit 15")
+    for name in find_names:
+        one_info={}
+        onename = "S" + name['b.name']
+        one_info['事件名称']=onename
+        for attr in to_search_attributes:
+            eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (onename, attr))
+            for data in eventinfo:
+                    one_info[attr] = str(data['b.name'])
+        result.append(one_info)
+    one_info['事件名称'] = "S0115US_1549"
+    for attr in to_search_attributes:
+        eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
+        for data in eventinfo:
+                one_info[attr] = str(data['b.name'])
+    result.append(one_info)
+    return jsonify(result)
