@@ -11,6 +11,8 @@ import jieba
 ######### config.py #########
 
 # basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 class Config:
     # SECRET_KEY = os.environ.get('SECRET_KEY')
     JSON_AS_ASCII = False
@@ -25,6 +27,7 @@ class Config:
         pass
 
 ######### config.py #########
+
 
 app = Flask(__name__)
 config = Config()
@@ -45,7 +48,8 @@ def get_pattern_bottom():
     find_names = graph.run("match (a:模式) where a.grade=2 return a.name")
     for data in find_names:
         s = str(data['a.name'])
-        find_child = graph.run("match (a:模式) where a.name='" + s + "' match (a)-[r]->(b) where exists(b.name) return a.name limit 1")
+        find_child = graph.run("match (a:模式) where a.name='" + s +
+                               "' match (a)-[r]->(b) where exists(b.name) return a.name limit 1")
         for detail in find_child:
             result.append(detail['a.name'])
     result = list(set(result))
@@ -57,20 +61,24 @@ def get_pattern_bottom():
 def index():
     return render_template("index.html", title='首页', active=1)
 
+
 @app.route("/event_search")
 def event_search():
     options = get_pattern_bottom()
     return render_template("event-search.html", title="事件检索", options=options, active=2)
 
+
 @app.route('/pattern')
 def pattern_graph():
     return render_template("pattern.html", title='模式图', active=3)
+
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
     PER_PAGE = 15  # 每页中包含的事件个数。常量名约定为全大写
     page = int(request.args['page'])
-    data = graph.run('match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag order by b.sortflag desc')
+    data = graph.run(
+        'match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag order by b.sortflag desc')
     strdata = [str(i['b.sortflag']) for i in data]
     page_num = math.ceil(len(strdata)/PER_PAGE)
     startnum = (page - 1) * PER_PAGE
@@ -100,7 +108,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     key = request.args['key']
     value = request.args['value']
     events = []
-    page=request.args['page']
+    page = request.args['page']
     PER_PAGE = 15
     if key == '事件名称':
         events.append('S' + value)
@@ -117,16 +125,16 @@ def get_events_intro():  # 返回指定属性的事件简介信息
             for data in rnode:
                 events.append("S" + data['b.name'])  # 事件名称
     else:
-        find_node = graph.run("match (c:模式{name:'" + key + "'}) match(c)-[:包含]->(a) match (a) where a.name='" \
-             + value + "' match (a)<-[:属性]-(b) return b.name")
+        find_node = graph.run("match (c:模式{name:'" + key + "'}) match(c)-[:包含]->(a) match (a) where a.name='"
+                              + value + "' match (a)<-[:属性]-(b) return b.name")
         for data in find_node:
             events.append("S" + data['b.name'])
     events = list(set(events))  # 去重
-    num=len(events)
+    num = len(events)
     page_num = math.ceil(num / PER_PAGE)
     startnum = (int(page) - 1) * PER_PAGE
     events_info = []
-    events=events[startnum:startnum+PER_PAGE]
+    events = events[startnum:startnum+PER_PAGE]
     for event in events:
         one_info = {}
         one_info['事件名'] = event
@@ -145,6 +153,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     events_info.append({'page_num': page_num})
     return jsonify(events_info)
 
+
 @app.route('/event_info')
 def get_event_info():  # 根据事件名返回事件所有属性
     event_name = request.args['event_name']
@@ -157,14 +166,15 @@ def get_event_info():  # 根据事件名返回事件所有属性
     one_info['事件名'] = event
     to_search_attributes = get_pattern_bottom()
     for attr in to_search_attributes:
-        eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (event, attr))
+        eventinfo = graph.run(
+            'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (event, attr))
         for data in eventinfo:
             one_info[attr] = str(data['b.name'])
     return jsonify(one_info)
 
 
 @app.route('/patt_node')
-def get_patt_node():#返回模式结点和边（source:link:target）
+def get_patt_node():  # 返回模式结点和边（source:link:target）
     patt_nodes = {}
     nodes = []
     pat_nodes = graph.run('match (a:模式) return a.name,a.grade')
@@ -180,12 +190,14 @@ def get_patt_node():#返回模式结点和边（source:link:target）
     for data in rank:
         t_rank.append(data['a.grade'])
     max_rank = max(t_rank)
-    print(max_rank)
+    # print(max_rank)
     for i in range(0, max_rank):
-        min_node = graph.run('match (a) where a.grade=' + str(i) + ' return a.name')
+        min_node = graph.run('match (a) where a.grade=' +
+                             str(i) + ' return a.name')
         for data_min in min_node:
             max_nodes = []
-            max_node = graph.run('match (a:模式{name:"' + data_min['a.name'] + '"})  match (a)-[:`包含`]->(b) where exists(b.grade) return b.name')
+            max_node = graph.run(
+                'match (a:模式{name:"' + data_min['a.name'] + '"})  match (a)-[:`包含`]->(b) where exists(b.grade) return b.name')
             for data_max in max_node:
                 max_nodes.append(data_max['b.name'])
             for maxnode in max_nodes:
@@ -194,36 +206,43 @@ def get_patt_node():#返回模式结点和边（source:link:target）
                 links['target'] = maxnode
                 links['linkText'] = '包含'
                 link.append(links)
-    patt_nodes['links']=link
+    patt_nodes['links'] = link
     return jsonify(patt_nodes)
 
+
 @app.route('/all_detail')
-def get_all_detail():  #返回所有事件名、航空公司、操作阶段等
+def get_all_detail():  # 返回所有事件名、航空公司、操作阶段等
     key = request.args['key']
     result = []
     if(key == "事件名称"):
-        find_details = graph.run("match (a:事件名称) match (a)-[:包含]->(b) return b.name")
+        find_details = graph.run(
+            "match (a:事件名称) match (a)-[:包含]->(b) return b.name")
     else:
-        find_details = graph.run("match (a:模式{name:'%s'}) match (a)-[:包含]->(b) return b.name" % key)
+        find_details = graph.run(
+            "match (a:模式{name:'%s'}) match (a)-[:包含]->(b) return b.name" % key)
     for data in find_details:
         result.append(data['b.name'])
     result = list(set(result))
     return jsonify(result)
 
+
 @app.route('/pattern_details')
-def get_pattern_details():  #返回模式图下的具体数据节点
+def get_pattern_details():  # 返回模式图下的具体数据节点
     name = request.args['name']
     limit = request.args['limit']
-    details=[]
-    finddetail = graph.run("match (a:模式{name:'" + name + "'}) match (a)-[:`包含`]->(b) return b.name limit " + limit)
+    details = []
+    finddetail = graph.run(
+        "match (a:模式{name:'" + name + "'}) match (a)-[:`包含`]->(b) return b.name limit " + limit)
     for detail in finddetail:
         details.append(detail['b.name'])
     return jsonify(details)
 
+
 @app.route('/reason_participle')
-def get_reason_participle():  #返回原因的分词
+def get_reason_participle():  # 返回原因的分词
     result = {}
-    findreason = graph.run("match (a:模式{name:'原因'}) match (a)-[:包含]->(b) return b.name")
+    findreason = graph.run(
+        "match (a:模式{name:'原因'}) match (a)-[:包含]->(b) return b.name")
     for data in findreason:
         seg_list = jieba.cut(str(data['b.name']), cut_all=False)
         for detail in seg_list:
@@ -234,24 +253,52 @@ def get_reason_participle():  #返回原因的分词
     result = sorted(result.items(), key=lambda x: x[1], reverse=False)
     return jsonify(result)
 
+
 @app.route('/some_event')
-def get_some_event():
-    result = []
-    to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点', '出事地点', '事件类型', '航线类型','航班类型','天气情况','操作阶段','原因','人员伤亡','结果','等级']
-    find_names = graph.run("match(a:事件名称) match (a)-[:包含]->(b) return b.name limit 15")
+def get_some_event():  # 返回16个事件信息
+    aptt_node = {}  # 以节点和边的形式返回 (source:link:target)
+    nodes = []
+    node = {}
+    links = []
+    link = {}
+    to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
+                            '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
+    find_names = graph.run(
+        "match(a:事件名称) match (a)-[:包含]->(b) return b.name limit 15")
     for name in find_names:
-        one_info={}
-        onename = "S" + name['b.name']
-        one_info['事件名称']=onename
+        tmpname = name['b.name']
+        onename = "S" + tmpname
+        node['id'] = tmpname
+        node['grade'] = 1
+        nodes.append(node.copy())  # 注意要放备份 不能直接放原版 否则后面修改影响前面数据
+        print(node)
         for attr in to_search_attributes:
-            eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (onename, attr))
+            eventinfo = graph.run(
+                'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (onename, attr))
             for data in eventinfo:
-                    one_info[attr] = str(data['b.name'])
-        result.append(one_info)
-    one_info['事件名称'] = "S0115US_1549"
+                node['id'] = data['b.name']
+                node['grade'] = 2
+                link['source'] = tmpname
+                link['target'] = data['b.name']
+                link['linkText'] = attr
+                nodes.append(node.copy())
+                links.append(link.copy())
+                break
+    # 追加一条属性比较完整的时间信息
+    node['id'] = "S0115US_1549"
+    node['grade'] = 1
+    nodes.append(node.copy())
     for attr in to_search_attributes:
-        eventinfo = graph.run('match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
+        eventinfo = graph.run(
+            'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
         for data in eventinfo:
-                one_info[attr] = str(data['b.name'])
-    result.append(one_info)
-    return jsonify(result)
+            node['id'] = data['b.name']
+            node['grade'] = 2
+            link['source'] = tmpname
+            link['target'] = data['b.name']
+            link['linkText'] = attr
+            nodes.append(node.copy())
+            links.append(link.copy())
+    aptt_node['nodes'] = nodes
+    aptt_node['links'] = links
+    return jsonify(aptt_node)
