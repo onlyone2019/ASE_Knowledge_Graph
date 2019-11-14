@@ -1,0 +1,24 @@
+<aside class="aside-panel">
+	<div>
+		<input
+			type="search"
+			id="search-input"
+			class="form-control"
+			placeholder="search..."
+		/>
+		<select
+			class="selectpicker show-tick form-control"
+			data-live-search="true"
+			title="选择查询依据"
+			id="select-query-basis"
+		>
+			<option>事件名称</option>
+			{% for option in options %} {% if option != "人员伤亡" %}
+			<option>{{ option }}</option>
+			{% endif %} {% endfor %}
+		</select>
+		<button type="button" class="btn btn-block" id="aside-search-button">
+			查询
+		</button>
+	</div>
+</aside>

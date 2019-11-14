@@ -14,7 +14,7 @@ function search() {
 			.find("option:selected")
 			.html();
 	if (key && value) {
-		$("#pager>ul").html("");
+		$(".pager>ul").html("");
 		$("main>div").html(getLoadingHTML("loading-events-card"));
 		$.get(`/events_intro?key=${key}&value=${value}&page=1`, data => {
 			showSearchedEventCards(1, data, key, value);
@@ -197,8 +197,8 @@ function renderPager(page, pageNum, url, clickCallback) {
 		pagerButtomHTML(">", false, "pager-next") +
 		pagerButtomHTML(">>", false, "pager-end");
 
-	$("#pager>ul").html(toAddPager);
-	$("#pager li").on("click", obj => {
+	$(".pager>ul").html(toAddPager);
+	$(".pager li").on("click", obj => {
 		if (
 			[
 				"<<",
@@ -213,21 +213,23 @@ function renderPager(page, pageNum, url, clickCallback) {
 			].indexOf(obj.target.innerHTML) == -1
 		) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
-			$("#pager>ul").html("");
+			$(".pager>ul").html("");
 			$.get(url + obj.target.innerHTML, data => {
+				let key = /(?<=key=).*?(?=&)/.exec(url);
+				let value = /(?<=value=).*?(?=&)/.exec(url);
 				clickCallback(
 					obj.target.innerHTML,
 					data,
-					/(?<=key=).*?(?=&)/.exec(url)[0],
-					/(?<=value=).*?(?=&)/.exec(url)[0]
+					key ? key : null,
+					value ? value : null
 				);
 			});
 		}
 	});
-	$("#pager #pager-previous").on("click", () => {
+	$(".pager .pager-previous").on("click", () => {
 		if (page > 1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
-			$("#pager>ul").html("");
+			$(".pager>ul").html("");
 			$.get(url + (page - 1), data => {
 				clickCallback(
 					page - 1,
@@ -238,10 +240,10 @@ function renderPager(page, pageNum, url, clickCallback) {
 			});
 		}
 	});
-	$("#pager #pager-next").on("click", () => {
+	$(".pager .pager-next").on("click", () => {
 		if (page < pageNum) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
-			$("#pager>ul").html("");
+			$(".pager>ul").html("");
 			$.get(url + (page + 1), data => {
 				clickCallback(
 					page + 1,
@@ -252,10 +254,10 @@ function renderPager(page, pageNum, url, clickCallback) {
 			});
 		}
 	});
-	$("#pager #pager-home").on("click", () => {
+	$(".pager .pager-home").on("click", () => {
 		if (page != 1) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
-			$("#pager>ul").html("");
+			$(".pager>ul").html("");
 			$.get(url + 1, data => {
 				clickCallback(
 					1,
@@ -266,10 +268,10 @@ function renderPager(page, pageNum, url, clickCallback) {
 			});
 		}
 	});
-	$("#pager #pager-end").on("click", () => {
+	$(".pager .pager-end").on("click", () => {
 		if (page != pageNum) {
 			$("main>div").html(getLoadingHTML("loading-events-card"));
-			$("#pager>ul").html("");
+			$(".pager>ul").html("");
 			$.get(url + pageNum, data => {
 				clickCallback(
 					pageNum,

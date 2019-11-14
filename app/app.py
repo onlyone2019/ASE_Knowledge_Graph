@@ -72,6 +72,9 @@ def event_search():
 def pattern_graph():
     return render_template("pattern.html", title='模式图', active=3)
 
+@app.route('/data_graph')
+def data_graph():
+    return render_template("data-graph.html", title='数据图', active=4)
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
