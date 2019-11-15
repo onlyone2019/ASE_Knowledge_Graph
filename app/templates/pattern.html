@@ -24,6 +24,7 @@
 
 		let svg = createSvg(WIDTH, HEIGHT, true);
 		let aForceDirectedGraph = forceDirectedGraph(svg)
+			.linksEndPoint("id")
 			.json("/patt_node")
 			.render();
 	}
