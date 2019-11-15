@@ -4,14 +4,6 @@
 
 {% block outer_css %}
 <link
-	rel="stylesheet"
-	href="{{ url_for('static', filename='css/general.css') }}"
-/>
-<link
-	rel="stylesheet"
-	href="{{ url_for('static', filename='css/event-search.css') }}"
-/>
-<link
 	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
 	rel="stylesheet"
 />
@@ -40,12 +32,12 @@
 		/* 下拉框绑定单击事件 */
 
 		/* 加载事件卡片 */
-		$('#pager>ul').html('')
+		$('.pager>ul').html('')
 		$('main>div').html(getLoadingHTML('loading-events-card'));
 		$.get("/all_events_intro?page=1", data => { showAllEventCards(1, data) })
 		/* 加载事件卡片 */
 
-		$('#search-button').on('click', search);	// 搜索按钮绑定单击事件
+		$('#aside-search-button').on('click', search);	// 搜索按钮绑定单击事件
 	}
 </script>
 {% endblock %}
@@ -75,31 +67,11 @@
 			</div>
 		</div>
 	</div>
-	<aside>
-		<div>
-			<input type="search" id="search-input" class="form-control" placeholder="search..." />
-			<select
-				class="selectpicker show-tick form-control"
-				data-live-search="true"
-				title="选择查询依据"
-				id="select-query-basis"
-			>
-				<option>事件名称</option>
-				{% for option in options %}
-					{% if option != "人员伤亡" %}
-						<option>{{ option }}</option>
-					{% endif %}
-				{% endfor %}
-			</select>
-			<button type="button" class="btn btn-block" id="search-button">
-				查询
-			</button>
-		</div>
-	</aside>
+	{% include "include/aside.html" %}
 	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
-	<main>
+	<main class="event-card-container">
 		<div class="event-card"></div>
-		<nav id="pager">
+		<nav class="pager">
 			<ul class="pagination justify-content-center"></ul>
 		</nav>
 	</main>

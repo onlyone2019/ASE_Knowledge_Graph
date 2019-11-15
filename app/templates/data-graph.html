@@ -7,9 +7,14 @@
 	rel="stylesheet"
 	href="{{ url_for('static', filename='css/chart.css') }}"
 />
+<link
+	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
+	rel="stylesheet"
+/>
 {% endblock %}
 
 {% block outer_script %}
+<script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
 <script src="{{ url_for('static', filename='js/chart-lib.js') }}"></script>
 <script src="{{ url_for('static', filename='js/force-directed-graph-lib.js') }}"></script>
 <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -24,8 +29,7 @@
 
 		let svg = createSvg(WIDTH, HEIGHT, true);
 		let aForceDirectedGraph = forceDirectedGraph(svg)
-			.linksEndPoint("id")
-			.json("/patt_node")
+			.json("/some_event")
 			.render();
 	}
 </script>
@@ -33,4 +37,5 @@
 
 {% block main_content %}
 	{% include "include/navbar.html" %}
+	{% include "include/aside.html" %}
 {% endblock %}

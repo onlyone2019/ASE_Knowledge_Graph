@@ -5,6 +5,7 @@ function forceDirectedGraph(svg) {
 	let _fontSize = 12; // 结点和链接文字大小
 	let _jsonUrl;
 	let _colorScale = d3.scaleOrdinal(d3.schemeSet3);
+	let _linksEndPoint = "index";	// 默认以结点的索引依据进行连线
 
 	/******** ↓ 获取或设置属性值 *********/
 
@@ -37,6 +38,11 @@ function forceDirectedGraph(svg) {
 		return _graph;
 	};
 
+	_graph.linksEndPoint = lep => {
+		_linksEndPoint = lep;
+		return _graph;
+	}
+
 	/******** ↑ 获取或设置属性值 *********/
 
 	_graph.render = () => {
@@ -61,7 +67,7 @@ function forceDirectedGraph(svg) {
 					.forceLink(data.links)
 					.strength(1)
 					.distance(150)
-					.id(d => d.id)
+					.id(d => d[_linksEndPoint])
 			); // 连接力
 			_simulation.on("tick", ticked); // 监听 tick 事件
 
