@@ -312,3 +312,70 @@ def get_some_event():  # 返回16个事件信息
     aptt_node['nodes'] = nodes
     aptt_node['links'] = links
     return jsonify(aptt_node)
+
+@app.route('/one_event')
+def get_one_event():
+    nodes = []
+    node = {}
+    links = []
+    link = {}
+    cnt1 = 0
+    cnt2=0
+    key = request.args['key']
+    value = request.args['value']
+    to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
+                            '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
+    if key == '事件名称':  #如果根据事件名称查询事件具体信息
+        node['id'] = value
+        node['grade'] = 1
+        nodes.append(node.copy())
+        for attr in to_search_attributes:
+            str='match (b) where b.name="%s" match (b)-[:属性{name:"%s"}]->(a) return a.name' % (value, attr)
+            print(str)
+            event_info = graph.run(str)
+            for data in event_info:
+                node['id'] = data['a.name']
+                node['grade'] = 2
+                cnt2=cnt2+1
+                link['source'] = cnt1
+                link['target'] = cnt1+cnt2
+                link['linkText'] = attr
+                nodes.append(node.copy())
+                links.append(link.copy())
+                break
+    else:  #如果查的是某个属性关联的东西
+        node['id'] = value
+        node['grade'] = 2
+        nodes.append(node.copy())
+        for attr in to_search_attributes:
+            str= 'match (b) where b.name="%s" match (a)-[:属性{name:"%s"}]->(b) return a.name' % (value, attr)
+            # print(str)
+            event_info = graph.run(str)
+            for data in event_info:
+                node['id'] = data['a.name']
+                node['grade'] = 1
+                cnt2=cnt2+1
+                link['source'] = cnt1+cnt2
+                link['target'] = cnt1
+                link['linkText'] = attr
+                nodes.append(node.copy())
+                links.append(link.copy())
+                break
+        # cnt1 = cnt1 + cnt2+1
+        cnt2=cnt1 + cnt2
+        event_info = graph.run(
+            'match (b) where b.name="%s" match (a)-[:包含]->(b) return a.name' % (value))
+        for data in event_info:
+            node['id'] = data['a.name']
+            node['grade'] = 1
+            cnt2=cnt2+1
+            link['source'] = cnt1+cnt2
+            link['target'] = cnt1
+            link['linkText'] = "包含"
+            nodes.append(node.copy())
+            links.append(link.copy())
+            break
+    aptt_node = {}
+    aptt_node['nodes'] = nodes
+    aptt_node['links'] = links
+    return jsonify(aptt_node)
