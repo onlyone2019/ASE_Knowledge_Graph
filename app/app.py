@@ -261,41 +261,48 @@ def get_some_event():  # 返回16个事件信息
     node = {}
     links = []
     link = {}
+    cnt = 0
+    cnt2=0
     to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
                             '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
     find_names = graph.run(
         "match(a:事件名称) match (a)-[:包含]->(b) return b.name limit 15")
     for name in find_names:
+        # cnt=cnt+1
         tmpname = name['b.name']
         onename = "S" + tmpname
         node['id'] = tmpname
         node['grade'] = 1
+        cnt2=0
         nodes.append(node.copy())  # 注意要放备份 不能直接放原版 否则后面修改影响前面数据
-        print(node)
         for attr in to_search_attributes:
             eventinfo = graph.run(
                 'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (onename, attr))
             for data in eventinfo:
                 node['id'] = data['b.name']
                 node['grade'] = 2
-                link['source'] = tmpname
-                link['target'] = data['b.name']
+                cnt2=cnt2+1
+                link['source'] = cnt
+                link['target'] = cnt+cnt2
                 link['linkText'] = attr
                 nodes.append(node.copy())
                 links.append(link.copy())
                 break
+        cnt=cnt+1
     # 追加一条属性比较完整的时间信息
     node['id'] = "S0115US_1549"
     node['grade'] = 1
     nodes.append(node.copy())
+    cnt2=0
     for attr in to_search_attributes:
         eventinfo = graph.run(
             'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
         for data in eventinfo:
             node['id'] = data['b.name']
             node['grade'] = 2
-            link['source'] = tmpname
-            link['target'] = data['b.name']
+            cnt2=cnt2+1
+            link['source'] = cnt
+            link['target'] = cnt+cnt2
             link['linkText'] = attr
             nodes.append(node.copy())
             links.append(link.copy())
