@@ -291,7 +291,7 @@ def get_some_event():  # 返回16个事件信息
                 nodes.append(node.copy())
                 links.append(link.copy())
                 break
-        cnt=cnt+1
+        cnt=cnt+cnt2+1
     # 追加一条属性比较完整的时间信息
     node['id'] = "S0115US_1549"
     node['grade'] = 1
