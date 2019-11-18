@@ -1,8 +1,5 @@
-{% extends "base.html" %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block outer_css %}
+{% extends "base.html" %} {% block title %}{{ title }}{% endblock %} {% block
+outer_css %}
 <link
 	rel="stylesheet"
 	href="{{ url_for('static', filename='css/chart.css') }}"
@@ -11,31 +8,38 @@
 	href="https://cdn.bootcss.com/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
 	rel="stylesheet"
 />
-{% endblock %}
-
-{% block outer_script %}
+{% endblock %} {% block outer_script %}
 <script src="https://cdn.bootcss.com/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="{{ url_for('static', filename='js/chart-lib.js') }}"></script>
 <script src="{{ url_for('static', filename='js/force-directed-graph-lib.js') }}"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-{% endblock %}
-
-{% block inner_script %}
+{% endblock %} {% block inner_script %}
 <script>
 	window.onload = () => {
+		$("#go-to-top").on("click", goToTop); // 回到顶部
+
+		/* 下拉框绑定单击事件 */
+		let oSelect = $("#select-query-basis");
+		oSelect.flag = false;
+		oSelect.on("shown.bs.select", () => {
+			if (!oSelect.flag) {
+				$("#bs-select-1 li").on("click", modifySearchInputElement);
+				oSelect.flag = true;
+			}
+		});
+		/* 下拉框绑定单击事件 */
+
 		const WIDTH = screen.availWidth;
-		const HEIGHT = screen.availHeight - 66;	// 66 是导航栏高度
+		const HEIGHT = screen.availHeight - 66; // 66 是导航栏高度
 		// 这个高度让 svg 在浏览器全屏模式下刚好占满屏幕
 
-		let svg = createSvg(WIDTH, HEIGHT, true);
+		let svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
 		let aForceDirectedGraph = forceDirectedGraph(svg)
 			.json("/some_event")
 			.render();
-	}
-</script>
-{% endblock %}
 
-{% block main_content %}
-	{% include "include/navbar.html" %}
-	{% include "include/aside.html" %}
-{% endblock %}
+		$("#aside-search-button").on("click", searchNodes); // 搜索按钮绑定单击事件
+	};
+</script>
+{% endblock %} {% block main_content %} {% include "include/navbar.html" %} {%
+include "include/aside.html" %} {% endblock %}

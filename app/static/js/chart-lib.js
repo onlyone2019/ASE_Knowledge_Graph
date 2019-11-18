@@ -1,9 +1,10 @@
-function createSvg(width, height, canZoom = false, parent = "body") {
+function createSvg(width, height, canZoom = false, svgId = "", parent = "body") {
 	let svg = d3
 		.select(parent)
 		.append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.attr("id", svgId)
 
 	if (canZoom) {
 		let g = svg.append("g");

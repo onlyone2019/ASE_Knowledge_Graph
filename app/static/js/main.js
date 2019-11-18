@@ -1,3 +1,15 @@
+function goToTop() {
+	$("html, body").animate({ scrollTop: 0 }, "slow");
+}
+
+function getLoadingHTML(id) {
+	return `
+		<div id="${id}">
+			<div class="spinner-border text-warning" role="status"></div>
+			<span>Loading...</span>
+		</div>`;
+}
+
 function search() {
 	let key = $("#select-query-basis")
 		.find("option:selected")
@@ -296,4 +308,32 @@ function showEventDetails(obj) {
 		toAddHTML += "</tbody></table>";
 		$("#event-details .modal-body").html(toAddHTML);
 	});
+}
+
+function searchNodes() {
+	const WIDTH = screen.availWidth;
+	const HEIGHT = screen.availHeight - 66; // 66 是导航栏高度
+
+	let key = $("#select-query-basis")
+		.find("option:selected")
+		.html();
+	let value = "";
+	if (key === "时间")
+		value = $("#search-input")
+			.val()
+			.split("/")
+			.join("");
+	else if (key === "原因" || key === "结果") value = $("#search-input").val();
+	else
+		value = $("#select-attr-value")
+			.find("option:selected")
+			.html();
+	if (key && value) {
+		let svg = $("#mainSvg");
+		svg.remove();
+		svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
+		aForceDirectedGraph = forceDirectedGraph(svg)
+			.json(`/one_event?key=${key}&value=${value}`)
+			.render();
+	}
 }
