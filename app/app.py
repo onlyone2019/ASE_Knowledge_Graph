@@ -265,7 +265,10 @@ def get_some_event():  # 返回16个事件信息
     node = {}
     links = []
     link = {}
-    cnt = 0
+    node['id'] = "事件名称"
+    node['grade'] = 1
+    nodes.append(node.copy())
+    cnt = 1
     cnt2=0
     to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
                             '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
@@ -276,7 +279,10 @@ def get_some_event():  # 返回16个事件信息
         tmpname = name['b.name']
         onename = "S" + tmpname
         node['id'] = tmpname
-        node['grade'] = 1
+        node['grade'] = 2
+        link['sorce'] = 0
+        link['target'] = cnt
+        link['linkText']="包含"
         cnt2=0
         nodes.append(node.copy())  # 注意要放备份 不能直接放原版 否则后面修改影响前面数据
         for attr in to_search_attributes:
@@ -284,7 +290,7 @@ def get_some_event():  # 返回16个事件信息
                 'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (onename, attr))
             for data in eventinfo:
                 node['id'] = data['b.name']
-                node['grade'] = 2
+                node['grade'] = 3
                 cnt2=cnt2+1
                 link['source'] = cnt
                 link['target'] = cnt+cnt2
@@ -295,15 +301,20 @@ def get_some_event():  # 返回16个事件信息
         cnt=cnt+cnt2+1
     # 追加一条属性比较完整的时间信息
     node['id'] = "S0115US_1549"
-    node['grade'] = 1
+    node['grade'] = 2
     nodes.append(node.copy())
+    link['sorce'] = 0
+    link['target'] = cnt
+    link['linkText'] = "包含"
+    links.append(link.copy())
+    cnt=cnt+1
     cnt2=0
     for attr in to_search_attributes:
         eventinfo = graph.run(
             'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
         for data in eventinfo:
             node['id'] = data['b.name']
-            node['grade'] = 2
+            node['grade'] = 3
             cnt2=cnt2+1
             link['source'] = cnt
             link['target'] = cnt+cnt2
@@ -314,8 +325,8 @@ def get_some_event():  # 返回16个事件信息
     aptt_node['links'] = links
     return jsonify(aptt_node)
 
-@app.route('/one_event')
-def get_one_event():
+@app.route('/one_event')  #用于事件图中查找具体信息
+def get_one_event():      #输入要查询的key和value 返回和那个节点相关的节点和边
     nodes = []
     node = {}
     links = []
