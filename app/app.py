@@ -17,9 +17,9 @@ class Config:
     # SECRET_KEY = os.environ.get('SECRET_KEY')
     JSON_AS_ASCII = False
     PY2NEO_CONFIG = {       # py2neo 连接配置
-        "host": "47.94.94.136",
+        "host": "localhost",
         "username": "neo4j",
-        "password": "1358044937"
+        "password": "comeon2017"
     }
 
     @staticmethod
@@ -393,3 +393,12 @@ def get_one_event():      #输入要查询的key和value 返回和那个节点�
     aptt_node['nodes'] = nodes
     aptt_node['links'] = links
     return jsonify(aptt_node)
+
+@app.route('/del_oneevent')  #删除一个事件的信息
+def to_del_oneevent():
+    name = request.args['name']
+    name = "S" + name
+    graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % name)
+    result = {}
+    result['success']=True
+    return jsonify(result)
