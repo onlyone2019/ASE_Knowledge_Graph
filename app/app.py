@@ -19,7 +19,7 @@ class Config:
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
         "username": "neo4j",
-        "password": "comeon2017"
+        "password": "********"
     }
 
     @staticmethod
@@ -42,6 +42,232 @@ graph = Graph(
 )
 matcher = NodeMatcher(graph)
 
+# 事件名称 时间 客机型号 航空公司 航班号 起飞地点 降落地点 出事地点
+# 事件类型 航线类型 航班类型 天气情况 操作阶段 原因 结果 人员伤亡 等级
+def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
+             evenType, airlineType, flightType, weather, stage, reason, result, injured, grade):
+    event_name = "S" + name
+    # 添加事件名节点
+    s = "match (a:事件名称) create (b:"+event_name + \
+        "{name:'"+name+"'}) create (a)-[:包含]->(b)"
+    graph.run(s)
+    index = "match (b:" + event_name + ")"
+    # 时间节点建立
+    if time != "":
+        check_time = "T" + time
+        find_result = matcher.match(check_time, name=time).first()
+        if find_result == None:
+            construct_time = index + " match (c:模式{name:'时间'}) create (d:T" + time + \
+                "{name:'"+time + \
+                "'}) create (c)-[:包含]->(d) create (b)-[:属性{name:'时间'}]->(d)"
+            graph.run(construct_time)
+        else:
+            construct_time = index + \
+                " match (d:T"+time+") create (b)-[:属性{name:'时间'}]->(d)"
+            graph.run(construct_time)
+    # 客机型号节点建立
+    if plane!="":
+        check_plane = plane
+        find_plane = matcher.match(plane, name=plane).first()
+        if find_plane == None:
+            construct_plane = index + " match (g:模式{name:'客机型号'}) create(h:" + check_plane + \
+                "{name:'"+check_plane + \
+                "'}) create (g)-[:包含]->(h) create (b)-[:属性{name:'客机型号'}]->(h)"
+            graph.run(construct_plane)
+        else:
+            construct_plane = index + \
+                "match (h:"+check_plane+") create (b)-[:属性{name:'客机型号'}]->(h)"
+            graph.run(construct_plane)
+    # #航空公司节点建立
+    if airline!="":
+        check_airline = airline
+        find_airline = matcher.match(airline, name=airline).first()
+        if find_airline == None:
+            construct_airline = index + " match (e:模式{name:'航空公司'}) create(f:" + check_airline + \
+                "{name:'" + check_airline + \
+                "'}) create (e)-[:包含]->(f) create (b)-[:属性{name:'航空公司'}]->(f)"
+            graph.run(construct_airline)
+        else:
+            construct_airline = index + \
+                "match (f:" + check_airline + \
+                ") create (b)-[:属性{name:'航空公司'}]->(f)"
+            graph.run(construct_airline)
+    # 航班号节点建立
+    if flightnum!="":
+        construct_flight = index + "match (hbh:模式{name:'航班号'}) create(jhbh:h" + str(flightnum)+"{name:'" + str(
+            flightnum) + "'}) create (hbh)-[:包含]->(jhbh) create (b)-[:属性{name:'航班号'}]->(jhbh)"
+        graph.run(construct_flight)
+    # 起飞地点节点建立
+    if beginPlace!="":
+        check_beginPlace = str(beginPlace)
+        find_beginPlace = matcher.match(beginPlace, name=beginPlace).first()
+        if find_beginPlace == None:
+            construct_beginPlace = index + "match (qf:模式{name:'起飞地点'}) create(jqf:" + check_beginPlace + \
+                "{name:'" + check_beginPlace + \
+                "'}) create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'起飞地点'}]->(jqf)"
+            graph.run(construct_beginPlace)
+        else:
+            construct_beginPlace = index + \
+                "match (qf:模式{name:'起飞地点'}) match(jqf:" + check_beginPlace + \
+                ") create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'起飞地点'}]->(jqf)"
+            graph.run(construct_beginPlace)
+    # 降落地点节点建立
+    if landPlace!="":
+        check_landPlace = str(landPlace)
+        find_landPlace = matcher.match(landPlace, name=landPlace).first()
+        if find_landPlace == None:
+            construct_landPlace = index + " match (qf:模式{name:'降落地点'}) create(jqf:" + check_landPlace + \
+                "{name:'" + check_landPlace + \
+                "'}) create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'降落地点'}]->(jqf)"
+            graph.run(construct_landPlace)
+        else:
+            construct_landPlace = index + \
+                " match (qf:模式{name:'降落地点'}) match(jqf:" + check_landPlace + \
+                ") create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'降落地点'}]->(jqf)"
+            graph.run(construct_landPlace)
+    # 出事地点节点建立
+    if incidentPalce!="":
+        check_incidentPlace = str(incidentPalce)
+        if check_incidentPlace == "途中":
+            construct_incidentPlace = index + \
+                "match (a:途中） create (b)-[:属性{name:'出事地点'}]->(a)"
+            graph.run(construct_incidentPlace)
+        else:
+            find_incidentPlace = matcher.match(
+                incidentPalce, name=incidentPalce).first()
+            if find_incidentPlace == None:
+                construct_incidentPlace = index + " match(cs:模式{name:'出事地点'}) create(jcs:" + check_incidentPlace + \
+                    "{name:'" + check_incidentPlace + \
+                    "'}) create (cs)-[:包含]->(jcs) create (b)-[:属性{name:'出事地点'}]->(jcs)"
+                graph.run(construct_incidentPlace)
+            else:
+                construct_incidentPlace = index + \
+                    " match(cs:模式{name:'出事地点'}) match (jcs:" + check_incidentPlace + \
+                    ") create (cs)-[:包含]->(jcs) create (b)-[:属性{name:'出事地点'}]->(jcs)"
+                graph.run(construct_incidentPlace)
+    # 事件类型节点建立
+    if evenType!="":
+        check_eventType = str(evenType)
+        find_eventType = matcher.match(evenType, name=evenType).first()
+        if find_eventType == None:
+            construct_eventType = index + "match (sl:模式{name:'事件类型'}) create (jsl:" + check_eventType + \
+                "{name:'" + check_eventType + \
+                "'}) create (sl)-[:包含]->(jsl) create (b)-[:属性{name:'事件类型'}]->(jsl)"
+            graph.run(construct_eventType)
+        else:
+            construct_eventType = index + \
+                "match (jsl:" + check_eventType + \
+                ") create (b)-[:属性{name:'事件类型'}]->(jsl)"
+            graph.run(construct_eventType)
+    # 航线类型节点建立
+    if airlineType!="":
+        check_airlineType = str(airlineType)
+        if check_airlineType == "国际":
+            construct_airlineType = index + \
+                "match(jhl:国际) create (b)-[:属性{name:'航线类型'}]->(jhl)"
+            graph.run(construct_airlineType)
+        else:
+            construct_airlineType = index + \
+                "match(jhl:国内) create (b)-[:属性{name:'航线类型'}]->(jhl)"
+            graph.run(construct_airlineType)
+    # 航班类型节点建立
+    if flightType!="":
+        check_flightType = str(flightType)
+        if check_flightType == "客运":
+            construct_flightType = index + \
+                "match (jhb:客运) create (b)-[:属性{name:'航班类型'}]->(jhb)"
+            graph.run(construct_flightType)
+        else:
+            construct_flightType = index + \
+                "match (jhb:货运) create (b)-[:属性{name:'航班类型'}]->(jhb)"
+            graph.run(construct_flightType)
+    # 天气情况节点建立
+    if weather!="":
+        check_weather = str(weather)
+        find_weater = matcher.match(weather, name=weather).first()
+        if find_weater == None:
+            construct_weather = index + "match (tq:模式{name:'天气情况'}) create (jtq:" + check_weather + \
+                "{name:'" + check_weather + \
+                "'}) create (tq)-[:包含]->(jtq) create (b)-[:属性{name:'天气情况'}]->(jtq)"
+            graph.run(construct_weather)
+        else:
+            construct_weather = index + \
+                "match(jtq:" + check_weather + \
+                ") create (b)-[:属性{name:'天气情况'}]->(jtq)"
+            graph.run(construct_weather)
+    # 操作阶段节点建立
+    if stage!="":
+        check_stage = str(stage)
+        find_stage = matcher.match(stage, name=stage).first()
+        if find_stage == None:
+            construct_stage = index + "match (cj:模式{name:'操作阶段'}) create (jcj:" + check_stage + \
+                "{name:'" + check_stage + \
+                "'}) create (cj)-[:包含]->(jcj) create (b)-[:属性{name:'操作阶段'}]->(jcj)"
+            graph.run(construct_stage)
+        else:
+            construct_stage = index + \
+                "match(jcj:"+check_stage + ") create (b)-[:属性{name:'操作阶段'}]->(jcj)"
+            graph.run(construct_stage)
+    # 原因节点建立
+    # check_reason = reason
+    if reason!="":
+        find_reason = matcher.match(reason).first()
+        if find_reason == None:
+            construct_reason = index + "match (rea:模式{name:'原因'}) create (jrea:" + reason + \
+                "{name:'" + reason + \
+                "'}) create (rea)-[:包含]->(jrea) create (b)-[:属性{name:'原因'}]->(jrea)"
+        else:
+            construct_reason = index + \
+                "match (jrea:" + reason + \
+                "{name:'" + reason + "'}) create (b)-[:属性{name:'原因'}]->(jrea)"
+        graph.run(construct_reason)
+    # 结果节点建立
+    if result!="":
+        if result == "安全着陆":
+            construct_result = index + \
+                "match (a) where id(a)=7438 create (b)-[:属性{name:'结果'}]->(a)"
+            graph.run(construct_result)
+        else:
+            # check_result = result
+            find_result = matcher.match(result).first()
+            if find_result == None:
+                construct_result = index + "match (resul:模式{name:'结果'}) create (jresul:" + result + \
+                    "{name:'" + result + \
+                    "'}) create (resul)-[:包含]->(jresul) create (b)-[:属性{name:'结果'}]->(jresul)"
+            else:
+                construct_result = index + \
+                    "match (jresul:" + result + \
+                    "{name:'" + result + \
+                    "'}) create (b)-[:属性{name:'结果'}]->(jresul)"
+            graph.run(construct_result)
+    # 人员伤亡节点建立
+    if injured!="":
+        if injured == "无":
+            construct_injured = ""
+        else:
+            find_injured = matcher.match(injured, name=injured).first()
+            if find_injured == None:
+                construct_injured = index + "match (ry:模式{name:'人员伤亡'}) create (jresul:" + injured + \
+                    "{name:'" + injured + \
+                    "'}) create (ry)-[:包含]->(jresul) create (b)-[:属性{name:'人员伤亡'}]->(jresul)"
+            else:
+                construct_injured = index + \
+                    "match (jresul:" + injured + \
+                    "{name:'" + injured + \
+                    "'}) create (b)-[:属性{name:'人员伤亡'}]->(jresul)"
+            graph.run(construct_injured)
+    # 事件等级节点建立
+    if grade!="":
+        find_grade = matcher.match(grade, name=grade).first()
+        if find_grade == None:
+            construct_grade = index + " match (dj:模式{name:'等级'}) create (jdj:" + grade + \
+                "{name:'" + grade + \
+                "'}) create (dj)-[:包含]->(jdj) create (b)-[:属性{name:'等级'}]->(jdj)"
+            graph.run(construct_grade)
+        else:
+            construct_grade = index + \
+                " match (jdj:" + grade + ") create (b)-[:属性{name:'等级'}]->(jdj)"
+            graph.run(construct_grade)
 
 def get_pattern_bottom():
     result = []
@@ -72,10 +298,12 @@ def event_search():
 def pattern_graph():
     return render_template("pattern.html", title='模式图', active=3)
 
+
 @app.route('/data_graph')
 def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
+
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
@@ -269,7 +497,7 @@ def get_some_event():  # 返回16个事件信息
     node['grade'] = 1
     nodes.append(node.copy())
     cnt = 0
-    cnt2=0
+    cnt2 = 0
     to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
                             '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
     find_names = graph.run(
@@ -280,12 +508,12 @@ def get_some_event():  # 返回16个事件信息
         onename = "S" + tmpname
         node['id'] = tmpname
         node['grade'] = 2
-        cnt=cnt+1
+        cnt = cnt+1
         link['source'] = 0
         link['target'] = cnt
         link['linkText'] = "包含"
         links.append(link.copy())
-        cnt2=0
+        cnt2 = 0
         nodes.append(node.copy())  # 注意要放备份 不能直接放原版 否则后面修改影响前面数据
         for attr in to_search_attributes:
             eventinfo = graph.run(
@@ -293,31 +521,31 @@ def get_some_event():  # 返回16个事件信息
             for data in eventinfo:
                 node['id'] = data['b.name']
                 node['grade'] = 3
-                cnt2=cnt2+1
+                cnt2 = cnt2+1
                 link['source'] = cnt
                 link['target'] = cnt+cnt2
                 link['linkText'] = attr
                 nodes.append(node.copy())
                 links.append(link.copy())
                 break
-        cnt=cnt+cnt2
+        cnt = cnt+cnt2
     # 追加一条属性比较完整的时间信息
     node['id'] = "S0115US_1549"
     node['grade'] = 2
     nodes.append(node.copy())
-    cnt=cnt+1
+    cnt = cnt+1
     link['source'] = 0
     link['target'] = cnt
     link['linkText'] = "包含"
     links.append(link.copy())
-    cnt2=0
+    cnt2 = 0
     for attr in to_search_attributes:
         eventinfo = graph.run(
             'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % ("S0115US_1549", attr))
         for data in eventinfo:
             node['id'] = data['b.name']
             node['grade'] = 3
-            cnt2=cnt2+1
+            cnt2 = cnt2+1
             link['source'] = cnt
             link['target'] = cnt+cnt2
             link['linkText'] = attr
@@ -327,48 +555,51 @@ def get_some_event():  # 返回16个事件信息
     aptt_node['links'] = links
     return jsonify(aptt_node)
 
-@app.route('/one_event')  #用于事件图中查找具体信息
-def get_one_event():      #输入要查询的key和value 返回和那个节点相关的节点和边
+
+@app.route('/one_event')  # 用于事件图中查找具体信息
+def get_one_event():  # 输入要查询的key和value 返回和那个节点相关的节点和边
     nodes = []
     node = {}
     links = []
     link = {}
     cnt1 = 0
-    cnt2=0
+    cnt2 = 0
     key = request.args['key']
     value = request.args['value']
     to_search_attributes = ['时间', '客机型号', '航空公司', '航班号', '起飞地点', '降落地点',
                             '出事地点', '事件类型', '航线类型', '航班类型', '天气情况', '操作阶段', '原因', '人员伤亡', '结果', '等级']
-    if key == '事件名称':  #如果根据事件名称查询事件具体信息
+    if key == '事件名称':  # 如果根据事件名称查询事件具体信息
         node['id'] = value
         node['grade'] = 1
         nodes.append(node.copy())
         for attr in to_search_attributes:
-            str='match (b) where b.name="%s" match (b)-[:属性{name:"%s"}]->(a) return a.name' % (value, attr)
+            str = 'match (b) where b.name="%s" match (b)-[:属性{name:"%s"}]->(a) return a.name' % (
+                value, attr)
             print(str)
             event_info = graph.run(str)
             for data in event_info:
                 node['id'] = data['a.name']
                 node['grade'] = 2
-                cnt2=cnt2+1
+                cnt2 = cnt2+1
                 link['source'] = cnt1
                 link['target'] = cnt1+cnt2
                 link['linkText'] = attr
                 nodes.append(node.copy())
                 links.append(link.copy())
                 break
-    else:  #如果查的是某个属性关联的东西
+    else:  # 如果查的是某个属性关联的东西
         node['id'] = value
         node['grade'] = 2
         nodes.append(node.copy())
         for attr in to_search_attributes:
-            str= 'match (b) where b.name="%s" match (a)-[:属性{name:"%s"}]->(b) return a.name' % (value, attr)
+            str = 'match (b) where b.name="%s" match (a)-[:属性{name:"%s"}]->(b) return a.name' % (
+                value, attr)
             # print(str)
             event_info = graph.run(str)
             for data in event_info:
                 node['id'] = data['a.name']
                 node['grade'] = 1
-                cnt2=cnt2+1
+                cnt2 = cnt2+1
                 link['source'] = cnt1+cnt2
                 link['target'] = cnt1
                 link['linkText'] = attr
@@ -376,13 +607,13 @@ def get_one_event():      #输入要查询的key和value 返回和那个节点�
                 links.append(link.copy())
                 break
         # cnt1 = cnt1 + cnt2+1
-        cnt2=cnt1 + cnt2
+        cnt2 = cnt1 + cnt2
         event_info = graph.run(
             'match (b) where b.name="%s" match (a)-[:包含]->(b) return a.name' % (value))
         for data in event_info:
             node['id'] = data['a.name']
             node['grade'] = 1
-            cnt2=cnt2+1
+            cnt2 = cnt2+1
             link['source'] = cnt1+cnt2
             link['target'] = cnt1
             link['linkText'] = "包含"
@@ -394,11 +625,64 @@ def get_one_event():      #输入要查询的key和value 返回和那个节点�
     aptt_node['links'] = links
     return jsonify(aptt_node)
 
-@app.route('/del_oneevent')  #删除一个事件的信息
+
+@app.route('/del_oneevent', methods=["POST"])  # 删除一个事件的信息
 def to_del_oneevent():
-    name = request.args['name']
+    name = request.form['事件名']
     name = "S" + name
     graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % name)
     result = {}
-    result['success']=True
+    result['success'] = True
     return jsonify(result)
+
+
+@app.route('/add_oneevent', methods=["POST"])  # 添加一个事件
+def to_add_oneevent():
+    name = request.form['事件名']
+    time = request.form['时间']
+    plane = request.form['客机型号']
+    airline = request.form['航空公司']
+    flightnum = request.form['航班号']
+    beginPlace = request.form['起飞地点']
+    landPlace = request.form['降落地点']
+    incidentPalce=request.form['出事地点']
+    evenType = request.form['事件类型']
+    airlineType = request.form['航线类型']
+    flightType = request.form['航班类型']
+    weather = request.form['天气情况']
+    stage = request.form['操作阶段']
+    reason = request.form['原因']
+    result = request.form['结果']
+    injured = request.form['人员伤亡']
+    grade = request.form['等级']
+    addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
+             evenType, airlineType, flightType, weather, stage, reason, result, injured, grade)
+    return_result = {}
+    return_result['success'] = True
+    return jsonify(return_result)
+
+@app.route('/update_oneevent', methods=["POST"])  # 修改一个事件
+def to_update_oneevent():
+    name = request.form['事件名']
+    graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % ("S"+name))
+    time = request.form['时间']
+    plane = request.form['客机型号']
+    airline = request.form['航空公司']
+    flightnum = request.form['航班号']
+    beginPlace = request.form['起飞地点']
+    landPlace = request.form['降落地点']
+    incidentPalce=request.form['出事地点']
+    evenType = request.form['事件类型']
+    airlineType = request.form['航线类型']
+    flightType = request.form['航班类型']
+    weather = request.form['天气情况']
+    stage = request.form['操作阶段']
+    reason = request.form['原因']
+    result = request.form['结果']
+    injured = request.form['人员伤亡']
+    grade = request.form['等级']
+    addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
+             evenType, airlineType, flightType, weather, stage, reason, result, injured, grade)
+    return_result = {}
+    return_result['success'] = True
+    return jsonify(return_result)
