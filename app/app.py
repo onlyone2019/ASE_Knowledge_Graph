@@ -67,7 +67,6 @@ def event_search():
     options = get_pattern_bottom()
     return render_template("event-search.html", title="事件检索", options=options, active=2)
 
-
 @app.route('/pattern')
 def pattern_graph():
     return render_template("pattern.html", title='模式图', active=3)
@@ -76,6 +75,10 @@ def pattern_graph():
 def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
+
+@app.route('/pattern_bottom')
+def pattern_bottom():
+    return jsonify(get_pattern_bottom())
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息

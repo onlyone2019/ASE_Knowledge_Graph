@@ -205,7 +205,7 @@ a {
 
 	.event-card {
 		margin-top: 66px;
-		padding: 50px 70px 30px 70px;
+		padding: 70px 70px 30px 70px;
 
 		.card-body .row > div {
 			&:nth-child(odd) {
@@ -216,6 +216,10 @@ a {
 			&:nth-child(even) {
 				text-align: left;
 			}
+		}
+
+		.card-button {
+			padding-top: 20px;
 		}
 	}
 

@@ -18,7 +18,13 @@
 			href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css"
 			rel="stylesheet"
 		/>
+
+		<!-- Element -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
 		{% block outer_css %}{% endblock %}
 		{% block inner_css %}{% endblock %}
 		{% block inner_script %}{% endblock %}

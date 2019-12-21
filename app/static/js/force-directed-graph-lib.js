@@ -3,9 +3,10 @@ function forceDirectedGraph(svg) {
 	let _nodeRadius = 30; // 最大结点半径(grade 为 0 结点的半径)。其他结点会被缩放 1 - grade / 10 倍。
 	let _nodeSpacing = 1; // 结点间最小距离
 	let _fontSize = 12; // 结点和链接文字大小
+	let _forceManyBodyStrength = -300; // 多体力强度
 	let _jsonUrl;
 	let _colorScale = d3.scaleOrdinal(d3.schemeSet3);
-	let _linksEndPoint = "index";	// 默认以结点的索引依据进行连线
+	let _linksEndPoint = "index"; // 默认以结点的索引依据进行连线
 
 	/******** ↓ 获取或设置属性值 *********/
 
@@ -27,6 +28,12 @@ function forceDirectedGraph(svg) {
 		return _graph;
 	};
 
+	_graph.forceManyBodyStrength = fs => {
+		if (!fs) return _forceManyBodyStrength;
+		_forceManyBodyStrength = fs;
+		return _graph;
+	};
+
 	_graph.json = ju => {
 		if (!ju) return _jsonUrl;
 		_jsonUrl = ju;
@@ -41,7 +48,7 @@ function forceDirectedGraph(svg) {
 	_graph.linksEndPoint = lep => {
 		_linksEndPoint = lep;
 		return _graph;
-	}
+	};
 
 	/******** ↑ 获取或设置属性值 *********/
 
@@ -49,7 +56,7 @@ function forceDirectedGraph(svg) {
 		let _simulation = d3
 			.forceSimulation() // 创建力布局
 			.alphaDecay(0.01) // alpha 衰减速度
-			.force("charge", d3.forceManyBody().strength(-300)) // 多体力（多体力可以模拟引力和斥力）
+			.force("charge", d3.forceManyBody().strength(_forceManyBodyStrength)) // 多体力（多体力可以模拟引力和斥力）
 			.force(
 				"collision",
 				d3.forceCollide(_nodeRadius + _nodeSpacing).strength(1)
@@ -191,8 +198,8 @@ function forceDirectedGraph(svg) {
 			}
 
 			function showMoreNode(d) {
-				// currentNode = d3.select(this);
-				// d3.json(`/pattern_details?name=${d.id}&limit=15`).then(newData => {});
+				// console.log(data);
+				// console.log(d.id);
 			}
 
 			function ticked(e) {
