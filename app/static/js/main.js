@@ -110,6 +110,10 @@ function getCardHTML(item) {
 				<div class="card-text">
 					<div class="row no-gutters">${eventInfoHTML}</div>
 				</div>
+				<div class="card-button">
+					<button type="button" class="btn btn-outline-danger btn-sm delete-card-button" style="width: 40%">删除</button>
+					<button type="button" class="btn btn-outline-success btn-sm modify-card-button" style="width: 40%" data-toggle="modal" data-target="#event-details">修改</button>
+				</div>
 			</div>
 		</div>`;
 }
@@ -133,6 +137,8 @@ function showAllEventCards(page, data) {
 
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
+	$(".delete-card-button").on("click", deleteCard);
+	$(".modify-card-button").on("click", modifyCard);
 
 	renderPager(page, pageNum, "/all_events_intro?page=", showAllEventCards);
 }
@@ -155,6 +161,8 @@ function showSearchedEventCards(page, data, key, value) {
 	}
 	$("main>div").html(toAddHtml);
 	$("a.event-name").on("click", showEventDetails);
+	$(".delete-card-button").on("click", deleteCard);
+	$(".modify-card-button").on("click", modifyCard);
 
 	renderPager(
 		page,
@@ -310,9 +318,74 @@ function showEventDetails(obj) {
 	});
 }
 
+function modifyCard(obj) {
+	let title =
+		obj.target.parentElement.parentElement.firstElementChild.innerText;
+	$("#event-details .modal-title").html(title);
+	$("#event-details .modal-body").html(getLoadingHTML("loading-event-details"));
+	$.get(`event_info?event_name=S${title}`, data => {
+		let toAddHTML =
+			'<table class="table table-striped table-hover" id="eventDetailsTable"><tbody>';
+		for (let i in data)
+			toAddHTML += `<tr><th>${i}</th><td><input type="text" class="form-control" value="${data[i]}"></td></tr>`;
+		toAddHTML += "</tbody></table>";
+		$("#event-details .modal-body").html(toAddHTML);
+	});
+
+	$("#event-details .modal-footer").html(`
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+		<button type="button" class="btn btn-primary" onclick="sumbitCardData()">提交</button>
+	`);
+}
+
+function deleteCard(obj) {
+	let title =
+		obj.target.parentElement.parentElement.firstElementChild.innerText;
+	let data = {
+		事件名: title
+	};
+	$.post("#", data, () => {});
+}
+
+function sumbitCardData() {
+	let oTrs = $("#event-details .modal-body tr");
+	let data = {};
+	for (let tr of oTrs) {
+		let key = tr.children[0].innerText;
+		let value = tr.children[1].children[0].value;
+		if (value == "") {
+			console.log("不能为空");
+			return;
+		}
+		data[key] = value;
+	}
+	$.post("#", data, () => {});
+}
+
+function addCard() {
+	$("#event-details .modal-title").html("添加事件");
+	$("#event-details .modal-body").html(getLoadingHTML("loading-event-details"));
+	$.get(`pattern_bottom`, data => {
+		let toAddHTML =
+			'<table class="table table-striped table-hover" id="eventDetailsTable"><tbody>';
+		toAddHTML += `<tr><th>事件名</th><td><input type="text" class="form-control"></td></tr>`;
+		for (let i of data)
+			toAddHTML += `<tr><th>${i}</th><td><input type="text" class="form-control"></td></tr>`;
+		toAddHTML += "</tbody></table>";
+		$("#event-details .modal-body").html(toAddHTML);
+	});
+
+	$("#event-details .modal-footer").html(`
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+		<button type="button" class="btn btn-primary" onclick="sumbitCardData()">提交</button>
+	`);
+}
+
 function searchNodes() {
-	const WIDTH = screen.availWidth;
-	const HEIGHT = screen.availHeight - 66; // 66 是导航栏高度
+	const ASIDE_WIDTH = $(".aside-panel").outerWidth();
+	const NAVBAR_HEIGHT = $("#navbar").outerHeight();
+	const WIDTH = screen.availWidth - ASIDE_WIDTH;
+	const HEIGHT = screen.availHeight - NAVBAR_HEIGHT;
 
 	let key = $("#select-query-basis")
 		.find("option:selected")
@@ -332,6 +405,10 @@ function searchNodes() {
 		let svg = $("#mainSvg");
 		svg.remove();
 		svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
+		$("#mainSvg").attr(
+			"transform",
+			`translate(${ASIDE_WIDTH}, ${NAVBAR_HEIGHT})`
+		);
 		aForceDirectedGraph = forceDirectedGraph(svg)
 			.json(`/one_event?key=${key}&value=${value}`)
 			.render();

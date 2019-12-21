@@ -138,12 +138,14 @@ a {
   min-height: 100%; }
   .event-card-container .event-card {
     margin-top: 66px;
-    padding: 50px 70px 30px 70px; }
+    padding: 70px 70px 30px 70px; }
     .event-card-container .event-card .card-body .row > div:nth-child(odd) {
       text-align: right;
       font-weight: bold; }
       .event-card-container .event-card .card-body .row > div:nth-child(even) {
         text-align: left; }
+    .event-card-container .event-card .card-button {
+      padding-top: 20px; }
   @media screen and (max-width: 993px) {
     .event-card-container {
       width: 100%;   }

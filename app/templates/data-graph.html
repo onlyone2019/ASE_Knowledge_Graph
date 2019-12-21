@@ -29,13 +29,17 @@ outer_css %}
 		});
 		/* 下拉框绑定单击事件 */
 
-		const WIDTH = screen.availWidth;
-		const HEIGHT = screen.availHeight - 66; // 66 是导航栏高度
+		const ASIDE_WIDTH = $(".aside-panel").outerWidth();
+		const NAVBAR_HEIGHT = $("#navbar").outerHeight();
+		const WIDTH = screen.availWidth - ASIDE_WIDTH;
+		const HEIGHT = screen.availHeight - NAVBAR_HEIGHT;
 		// 这个高度让 svg 在浏览器全屏模式下刚好占满屏幕
 
 		let svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
+		$("#mainSvg").attr("transform", `translate(${ASIDE_WIDTH}, ${NAVBAR_HEIGHT})`)
 		let aForceDirectedGraph = forceDirectedGraph(svg)
 			.json("/some_event")
+			.forceManyBodyStrength(-1000)
 			.render();
 
 		$("#aside-search-button").on("click", searchNodes); // 搜索按钮绑定单击事件
