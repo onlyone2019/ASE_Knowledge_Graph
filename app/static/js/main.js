@@ -334,7 +334,7 @@ function modifyCard(obj) {
 
 	$("#event-details .modal-footer").html(`
 		<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-		<button type="button" class="btn btn-primary" onclick="sumbitCardData()">提交</button>
+		<button type="button" class="btn btn-primary" onclick="sumbitCardData('/update_oneevent')">提交</button>
 	`);
 }
 
@@ -344,10 +344,12 @@ function deleteCard(obj) {
 	let data = {
 		事件名: title
 	};
-	$.post("#", data, () => {});
+	$.post("/del_oneevent", data, () => {
+		location.reload();
+	});
 }
 
-function sumbitCardData() {
+function sumbitCardData(url) {
 	let oTrs = $("#event-details .modal-body tr");
 	let data = {};
 	for (let tr of oTrs) {
@@ -359,7 +361,9 @@ function sumbitCardData() {
 		}
 		data[key] = value;
 	}
-	$.post("#", data, () => {});
+	$.post(url, data, () => {
+		location.reload();
+	});
 }
 
 function addCard() {
@@ -377,7 +381,7 @@ function addCard() {
 
 	$("#event-details .modal-footer").html(`
 		<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-		<button type="button" class="btn btn-primary" onclick="sumbitCardData()">提交</button>
+		<button type="button" class="btn btn-primary" onclick="sumbitCardData('/add_oneevent')">提交</button>
 	`);
 }
 
