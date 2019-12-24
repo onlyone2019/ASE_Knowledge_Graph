@@ -77,6 +77,11 @@ def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
 
+@app.route('/statistics')
+def statistics():
+    options = get_pattern_bottom()
+    return render_template("statistics.html", title='数据图', options=options, active=4)
+
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
     PER_PAGE = 15  # 每页中包含的事件个数。常量名约定为全大写

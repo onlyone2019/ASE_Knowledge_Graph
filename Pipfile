@@ -4,6 +4,7 @@ url = "https://pypi.douban.com/simple"
 verify_ssl = true
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 flask = "*"
