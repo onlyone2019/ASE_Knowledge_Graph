@@ -721,3 +721,63 @@ def get_time_data():
                 result.append(tmp.copy())
                 break
     return jsonify(result)
+
+
+@app.route('/update_attr', methods=["POST"])
+def to_update_attr():
+    name = str(request.form['name'])
+    name = "S"+name
+    key = str(request.form['key'])
+    value = str(request.form['value'])
+    sql = "match (a:%s) match (a)-[:属性{name:'%s'}]->(b) match (b)-[r]-() return count(r)" % (
+        name, key)
+    sql_re = graph.run(sql)
+    cnt = 0
+    for detail in sql_re:
+        cnt = int(detail['count(r)'])
+        break
+    if cnt > 2:
+        sql = "match (a:%s) match (a)-[r:属性{name:'%s'}]->(b)  delete r " % (
+            name, key)
+    else:
+        sql = "match (a:%s) match (a)-[:属性{name:'%s'}]->(b) match (b)-[r]-(c)  delete r delete b " % (
+            name, key)
+    graph.run(sql)
+    if key != "时间":
+        find_key = matcher.match(value, name=value).first()
+    else:
+        find_key = matcher.match("T" + value, name=value).first()
+    if find_key == None:
+        if key != "时间":
+            sql = "match (s:%s) match (a:模式{name:'%s'}) create (b:%s{name:'%s'}) create (a)-[:包含]->(b) create (s)-[:属性{name:'%s'}]->(b)" % (
+                name, key, value, value, key)
+        else:
+            sql = "match (s:%s) match (a:模式{name:'%s'}) create (b:%s{name:'%s'}) create (a)-[:包含]->(b) create (s)-[:属性{name:'%s'}]->(b)" % (
+                name, key, "T"+value, value, key)
+        graph.run(sql)
+    else:
+        sql = "match (s:%s) match (b) where b.name='%s' create (s)-[:属性{name:'%s'}]->(b)" % (
+            name, value, key)
+        graph.run(sql)
+    return_result = {}
+    return_result['success'] = True
+    return jsonify(return_result)
+
+'''
+        if key != "时间":
+            sql = "match (a:"+ name +") match (a)-[:属性{name:'" + key + "'}]->(b) match (b)-[r]-(c)  delete r delete c match (d:模式{name:'" + \
+                key + "'}) create (e:"+value+"{name:'" + value + \
+                "'}) create (d)-[:包含]->(e) create (a)-[:属性{name:'" + \
+                key + "'}]->(e)"
+        else:
+            sql = "match (a:"+name+") match (a)-[:属性{name:'" + key + "'}]->(b) match (b)-[r]-(c)  delete r delete c match (d:模式{name:'" + \
+                key + "'}) create (e:"+ "T"+value +"{name:'" +value + \
+                "'}) create (d)-[:包含]->(e) create (a)-[:属性{name:'" + \
+                key + "'}]->(e)"
+        graph.run(sql)
+    else:
+        if key != "时间":
+            sql = ""
+        else:
+            sql=""
+'''
