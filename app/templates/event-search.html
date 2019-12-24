@@ -56,18 +56,14 @@
 					</button>
 				</div>
 				<div class="modal-body"></div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">
-						关闭
-					</button>
-					<button type="button" class="btn btn-primary">查看源文档</button>
-				</div>
+				<div class="modal-footer"></div>
 			</div>
 		</div>
 	</div>
 	{% include "include/aside.html" %}
 	<div id="go-to-top" class="shadow"><img src="{{ url_for('static', filename='images/go-to-top.svg') }}" alt="go-to-top"></div>
 	<main class="event-card-container">
+		<button onclick="addCard()" class="add-event-card btn btn-block btn-light btn-sm" type="button"  data-toggle="modal" data-target="#event-details" style="position: absolute; top: 90px; width: 86%; right: 7%">+ 添加事件</button>
 		<div class="event-card"></div>
 		<nav class="pager">
 			<ul class="pagination justify-content-center"></ul>

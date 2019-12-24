@@ -19,10 +19,11 @@
 <script>
 	window.onload = () => {
 		const WIDTH = screen.availWidth;
-		const HEIGHT = screen.availHeight - 66;	// 66 是导航栏高度
+		const HEIGHT = screen.availHeight - $("#navbar").outerHeight();
 		// 这个高度让 svg 在浏览器全屏模式下刚好占满屏幕
 
-		let svg = createSvg(WIDTH, HEIGHT, true);
+		let svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
+		$("#mainSvg").attr("id", $("#navbar").outerHeight());
 		let aForceDirectedGraph = forceDirectedGraph(svg)
 			.linksEndPoint("id")
 			.json("/patt_node")

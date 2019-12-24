@@ -91,9 +91,13 @@
 {% endblock %}
 {% block main_content %}
 <!-- {% include "include/navbar.html" %} -->
-<input type="text", id="fromtime">
+<button id="button">重绘</button>
 <script>
-    $('#fromtime').datepicker();
+    $("button").click(function(){
+        $.get("/time_data", {from_time:2013, to_time:2016}, function(data){
+            alert(111)
+        })
+    });
 </script>
 <!-- 创建图表容器 -->
 <div id="container"></div>
