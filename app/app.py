@@ -19,7 +19,7 @@ class Config:
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
         "username": "neo4j",
-        "password": "m1358044937"
+        "password": "comeon2017"
     }
 
     @staticmethod
@@ -44,6 +44,8 @@ matcher = NodeMatcher(graph)
 
 # 事件名称 时间 客机型号 航空公司 航班号 起飞地点 降落地点 出事地点
 # 事件类型 航线类型 航班类型 天气情况 操作阶段 原因 结果 人员伤亡 等级
+
+
 def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
              evenType, airlineType, flightType, weather, stage, reason, result, injured, grade):
     event_name = "S" + name
@@ -66,7 +68,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 " match (d:T"+time+") create (b)-[:属性{name:'时间'}]->(d)"
             graph.run(construct_time)
     # 客机型号节点建立
-    if plane!="":
+    if plane != "":
         check_plane = plane
         find_plane = matcher.match(plane, name=plane).first()
         if find_plane == None:
@@ -79,7 +81,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 "match (h:"+check_plane+") create (b)-[:属性{name:'客机型号'}]->(h)"
             graph.run(construct_plane)
     # #航空公司节点建立
-    if airline!="":
+    if airline != "":
         check_airline = airline
         find_airline = matcher.match(airline, name=airline).first()
         if find_airline == None:
@@ -93,12 +95,12 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 ") create (b)-[:属性{name:'航空公司'}]->(f)"
             graph.run(construct_airline)
     # 航班号节点建立
-    if flightnum!="":
+    if flightnum != "":
         construct_flight = index + "match (hbh:模式{name:'航班号'}) create(jhbh:h" + str(flightnum)+"{name:'" + str(
             flightnum) + "'}) create (hbh)-[:包含]->(jhbh) create (b)-[:属性{name:'航班号'}]->(jhbh)"
         graph.run(construct_flight)
     # 起飞地点节点建立
-    if beginPlace!="":
+    if beginPlace != "":
         check_beginPlace = str(beginPlace)
         find_beginPlace = matcher.match(beginPlace, name=beginPlace).first()
         if find_beginPlace == None:
@@ -112,7 +114,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 ") create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'起飞地点'}]->(jqf)"
             graph.run(construct_beginPlace)
     # 降落地点节点建立
-    if landPlace!="":
+    if landPlace != "":
         check_landPlace = str(landPlace)
         find_landPlace = matcher.match(landPlace, name=landPlace).first()
         if find_landPlace == None:
@@ -126,7 +128,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 ") create (qf)-[:包含]->(jqf) create (b)-[:属性{name:'降落地点'}]->(jqf)"
             graph.run(construct_landPlace)
     # 出事地点节点建立
-    if incidentPalce!="":
+    if incidentPalce != "":
         check_incidentPlace = str(incidentPalce)
         if check_incidentPlace == "途中":
             construct_incidentPlace = index + \
@@ -146,7 +148,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                     ") create (cs)-[:包含]->(jcs) create (b)-[:属性{name:'出事地点'}]->(jcs)"
                 graph.run(construct_incidentPlace)
     # 事件类型节点建立
-    if evenType!="":
+    if evenType != "":
         check_eventType = str(evenType)
         find_eventType = matcher.match(evenType, name=evenType).first()
         if find_eventType == None:
@@ -160,7 +162,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 ") create (b)-[:属性{name:'事件类型'}]->(jsl)"
             graph.run(construct_eventType)
     # 航线类型节点建立
-    if airlineType!="":
+    if airlineType != "":
         check_airlineType = str(airlineType)
         if check_airlineType == "国际":
             construct_airlineType = index + \
@@ -171,7 +173,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 "match(jhl:国内) create (b)-[:属性{name:'航线类型'}]->(jhl)"
             graph.run(construct_airlineType)
     # 航班类型节点建立
-    if flightType!="":
+    if flightType != "":
         check_flightType = str(flightType)
         if check_flightType == "客运":
             construct_flightType = index + \
@@ -182,7 +184,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 "match (jhb:货运) create (b)-[:属性{name:'航班类型'}]->(jhb)"
             graph.run(construct_flightType)
     # 天气情况节点建立
-    if weather!="":
+    if weather != "":
         check_weather = str(weather)
         find_weater = matcher.match(weather, name=weather).first()
         if find_weater == None:
@@ -196,7 +198,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 ") create (b)-[:属性{name:'天气情况'}]->(jtq)"
             graph.run(construct_weather)
     # 操作阶段节点建立
-    if stage!="":
+    if stage != "":
         check_stage = str(stage)
         find_stage = matcher.match(stage, name=stage).first()
         if find_stage == None:
@@ -206,11 +208,12 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
             graph.run(construct_stage)
         else:
             construct_stage = index + \
-                "match(jcj:"+check_stage + ") create (b)-[:属性{name:'操作阶段'}]->(jcj)"
+                "match(jcj:"+check_stage + \
+                ") create (b)-[:属性{name:'操作阶段'}]->(jcj)"
             graph.run(construct_stage)
     # 原因节点建立
     # check_reason = reason
-    if reason!="":
+    if reason != "":
         find_reason = matcher.match(reason).first()
         if find_reason == None:
             construct_reason = index + "match (rea:模式{name:'原因'}) create (jrea:" + reason + \
@@ -222,7 +225,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                 "{name:'" + reason + "'}) create (b)-[:属性{name:'原因'}]->(jrea)"
         graph.run(construct_reason)
     # 结果节点建立
-    if result!="":
+    if result != "":
         if result == "安全着陆":
             construct_result = index + \
                 "match (a) where id(a)=7438 create (b)-[:属性{name:'结果'}]->(a)"
@@ -241,7 +244,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                     "'}) create (b)-[:属性{name:'结果'}]->(jresul)"
             graph.run(construct_result)
     # 人员伤亡节点建立
-    if injured!="":
+    if injured != "":
         if injured == "无":
             construct_injured = ""
         else:
@@ -257,7 +260,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
                     "'}) create (b)-[:属性{name:'人员伤亡'}]->(jresul)"
             graph.run(construct_injured)
     # 事件等级节点建立
-    if grade!="":
+    if grade != "":
         find_grade = matcher.match(grade, name=grade).first()
         if find_grade == None:
             construct_grade = index + " match (dj:模式{name:'等级'}) create (jdj:" + grade + \
@@ -268,6 +271,7 @@ def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incid
             construct_grade = index + \
                 " match (jdj:" + grade + ") create (b)-[:属性{name:'等级'}]->(jdj)"
             graph.run(construct_grade)
+
 
 def get_pattern_bottom():
     result = []
@@ -293,6 +297,7 @@ def event_search():
     options = get_pattern_bottom()
     return render_template("event-search.html", title="事件检索", options=options, active=2)
 
+
 @app.route('/pattern')
 def pattern_graph():
     return render_template("pattern.html", title='模式图', active=3)
@@ -303,9 +308,11 @@ def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
 
+
 @app.route('/pattern_bottom')
 def pattern_bottom():
     return jsonify(get_pattern_bottom())
+
 
 @app.route('/all_events_intro')  # 不写请求方式，默认为 get
 def get_all_events_intro():  # 返回page页事件的简介信息
@@ -647,7 +654,7 @@ def to_add_oneevent():
     flightnum = request.form['航班号']
     beginPlace = request.form['起飞地点']
     landPlace = request.form['降落地点']
-    incidentPalce=request.form['出事地点']
+    incidentPalce = request.form['出事地点']
     evenType = request.form['事件类型']
     airlineType = request.form['航线类型']
     flightType = request.form['航班类型']
@@ -663,6 +670,7 @@ def to_add_oneevent():
     return_result['success'] = True
     return jsonify(return_result)
 
+
 @app.route('/update_oneevent', methods=["POST"])  # 修改一个事件
 def to_update_oneevent():
     name = request.form['事件名']
@@ -673,7 +681,7 @@ def to_update_oneevent():
     flightnum = request.form['航班号']
     beginPlace = request.form['起飞地点']
     landPlace = request.form['降落地点']
-    incidentPalce=request.form['出事地点']
+    incidentPalce = request.form['出事地点']
     evenType = request.form['事件类型']
     airlineType = request.form['航线类型']
     flightType = request.form['航班类型']
@@ -688,3 +696,28 @@ def to_update_oneevent():
     return_result = {}
     return_result['success'] = True
     return jsonify(return_result)
+
+
+@app.route('/time_data')
+def get_time_data():
+    from_t = request.args['from_time']
+    to_t = request.args['to_time']
+    from_time = int(from_t)
+    to_time = int(to_t) + 1
+    to_search_grade = ['一般', '重大', '严重', '特大', '事件', '事故']
+    result = []
+    for i in range(from_time, to_time):
+        tmp = {}
+        time = str(i)
+        tmp['time'] = time
+        for grade in to_search_grade:
+            sql = "match(a) where a.name=~'.*" + time + ".*' " + \
+                "match (b)-[:属性{name:'时间'}]->(a) " + "match (b)-[:属性{name:'等级'}]->(c) where c.name=~'.*" + str(
+                    grade) + ".*' return count(c)"
+            cnt = graph.run(sql)
+            for detail in cnt:
+                tmp['grade'] = grade
+                tmp['cnt'] = detail['count(c)']
+                result.append(tmp.copy())
+                break
+    return jsonify(result)
