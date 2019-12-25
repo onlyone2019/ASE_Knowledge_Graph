@@ -763,21 +763,14 @@ def to_update_attr():
     return_result['success'] = True
     return jsonify(return_result)
 
-'''
-        if key != "时间":
-            sql = "match (a:"+ name +") match (a)-[:属性{name:'" + key + "'}]->(b) match (b)-[r]-(c)  delete r delete c match (d:模式{name:'" + \
-                key + "'}) create (e:"+value+"{name:'" + value + \
-                "'}) create (d)-[:包含]->(e) create (a)-[:属性{name:'" + \
-                key + "'}]->(e)"
-        else:
-            sql = "match (a:"+name+") match (a)-[:属性{name:'" + key + "'}]->(b) match (b)-[r]-(c)  delete r delete c match (d:模式{name:'" + \
-                key + "'}) create (e:"+ "T"+value +"{name:'" +value + \
-                "'}) create (d)-[:包含]->(e) create (a)-[:属性{name:'" + \
-                key + "'}]->(e)"
-        graph.run(sql)
-    else:
-        if key != "时间":
-            sql = ""
-        else:
-            sql=""
-'''
+@app.route('/delete_attr', methods=["POST"])
+def to_delete_attr():
+    name = str(request.form['name'])
+    name = "S"+name
+    key = str(request.form['key'])
+    sql = "match (a:%s) match (a)-[r:属性{name:'%s'}]->(b) delete r" % (
+        name, key)
+    graph.run(sql)
+    return_result = {}
+    return_result['success'] = True
+    return jsonify(return_result)
