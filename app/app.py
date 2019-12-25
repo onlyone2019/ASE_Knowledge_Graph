@@ -297,6 +297,9 @@ def event_search():
     options = get_pattern_bottom()
     return render_template("event-search.html", title="事件检索", options=options, active=2)
 
+@app.route("/vue_test")
+def vue_test():
+    return render_template("vue-test.html")
 
 @app.route('/pattern')
 def pattern_graph():
@@ -637,7 +640,7 @@ def get_one_event():  # 输入要查询的key和value 返回和那个节点相�
 
 @app.route('/del_oneevent', methods=["POST"])  # 删除一个事件的信息
 def to_del_oneevent():
-    name = request.form['事件名']
+    name = request.json['事件名']
     name = "S" + name
     graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % name)
     result = {}
