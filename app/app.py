@@ -311,6 +311,10 @@ def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
 
+@app.route('/statistics')
+def statistics():
+    options = get_pattern_bottom()
+    return render_template("statistics.html", title='数据图', options=options, active=4)
 
 @app.route('/pattern_bottom')
 def pattern_bottom():
