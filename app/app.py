@@ -19,7 +19,7 @@ class Config:
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
         "username": "neo4j",
-        "password": "********"
+        "password": "*******"
     }
 
     @staticmethod
@@ -323,9 +323,14 @@ def get_all_events_intro():  # 返回page页事件的简介信息
     data = graph.run(
         'match (a:事件名称) match (a)-[:`包含`]->(b) return b.sortflag order by b.sortflag desc')
     strdata = [str(i['b.sortflag']) for i in data]
-    page_num = math.ceil(len(strdata)/PER_PAGE)
+    page_num = math.ceil(len(strdata) / PER_PAGE)
     startnum = (page - 1) * PER_PAGE
-    newstr = strdata[startnum: (startnum + 15)]
+    index = 0
+    if startnum == 0:
+        index = 16
+    else:
+        index=15
+    newstr = strdata[startnum: (startnum + index)]
     events = []
     for name in newstr:
         one_info = {}
