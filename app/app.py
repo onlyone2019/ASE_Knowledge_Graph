@@ -19,7 +19,7 @@ class Config:
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
         "username": "neo4j",
-        "password": "comeon2017"
+        "password": "********"
     }
 
     @staticmethod
@@ -44,16 +44,13 @@ matcher = NodeMatcher(graph)
 
 # 事件名称 时间 客机型号 航空公司 航班号 起飞地点 降落地点 出事地点
 # 事件类型 航线类型 航班类型 天气情况 操作阶段 原因 结果 人员伤亡 等级
-
-
 def addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
              evenType, airlineType, flightType, weather, stage, reason, result, injured, grade):
-    event_name = "S" + name
     # 添加事件名节点
-    s = "match (a:事件名称) create (b:"+event_name + \
-        "{name:'"+name+"'}) create (a)-[:包含]->(b)"
+    s = "match (a:事件名称) create (b:"+name + \
+        "{name:'"+name[1:]+"'}) create (a)-[:包含]->(b)"
     graph.run(s)
-    index = "match (b:" + event_name + ")"
+    index = "match (b:" + name + ")"
     # 时间节点建立
     if time != "":
         check_time = "T" + time
@@ -294,12 +291,8 @@ def index():
 
 @app.route("/event_search")
 def event_search():
-    options = get_pattern_bottom()
-    return render_template("event-search.html", title="事件检索", options=options, active=2)
+    return render_template("event-search.html")
 
-@app.route("/vue_test")
-def vue_test():
-    return render_template("vue-test.html")
 
 @app.route('/pattern')
 def pattern_graph():
@@ -311,10 +304,12 @@ def data_graph():
     options = get_pattern_bottom()
     return render_template("data-graph.html", title='数据图', options=options, active=4)
 
+
 @app.route('/statistics')
 def statistics():
     options = get_pattern_bottom()
     return render_template("statistics.html", title='数据图', options=options, active=4)
+
 
 @app.route('/pattern_bottom')
 def pattern_bottom():
@@ -340,7 +335,7 @@ def get_all_events_intro():  # 返回page页事件的简介信息
         names = list(set(names))
         to_search_attributes = ['时间', '出事地点', '航班号', '客机型号', '航空公司']
         for its in names:
-            one_info['事件名'] = its
+            one_info['事件名称'] = its
             for attr in to_search_attributes:
                 event = graph.run(
                     'match (a:%s) match (a)-[:属性{name:"%s"}]->(b) return b.name' % (its, attr))
@@ -359,8 +354,8 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     page = request.args['page']
     PER_PAGE = 15
     if key == '事件名称':
-        events.append('S' + value)
-    elif (key == '原因') | (key == '结果'):
+        events.append(value)
+    elif key == '原因' or key == '结果':
         find_str = "match (a:模式{name:'" + key + "'})  match (b) where b.name=~'.*" + \
                    value + ".*' match(a)-[:包含]->(b) return b.name"
         dnode = graph.run(find_str)
@@ -385,7 +380,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
     events = events[startnum:startnum+PER_PAGE]
     for event in events:
         one_info = {}
-        one_info['事件名'] = event
+        one_info['事件名称'] = event
         matcher_event = NodeMatcher(graph)
         find_event = matcher_event.match(event).first()
         if find_event != None:
@@ -403,7 +398,7 @@ def get_events_intro():  # 返回指定属性的事件简介信息
 
 
 @app.route('/event_info')
-def get_event_info():  # 根据事件名返回事件所有属性
+def get_event_info():  # 根据事件名称返回事件所有属性
     event_name = request.args['event_name']
     find_event = graph.run('match (b:' + event_name + ') return b.name')
     for data in find_event:
@@ -411,7 +406,7 @@ def get_event_info():  # 根据事件名返回事件所有属性
     node = str(node)
     event = 'S' + node
     one_info = {}
-    one_info['事件名'] = event
+    one_info['事件名称'] = event
     to_search_attributes = get_pattern_bottom()
     for attr in to_search_attributes:
         eventinfo = graph.run(
@@ -459,17 +454,16 @@ def get_patt_node():  # 返回模式结点和边（source:link:target）
 
 
 @app.route('/all_detail')
-def get_all_detail():  # 返回所有事件名、航空公司、操作阶段等
+def get_all_detail():  # 返回所有事件名称、航空公司、操作阶段等
     key = request.args['key']
-    result = []
     if(key == "事件名称"):
         find_details = graph.run(
             "match (a:事件名称) match (a)-[:包含]->(b) return b.name")
+        result = [('S' + item['b.name']) for item in find_details]
     else:
         find_details = graph.run(
             "match (a:模式{name:'%s'}) match (a)-[:包含]->(b) return b.name" % key)
-    for data in find_details:
-        result.append(data['b.name'])
+        result = [item['b.name'] for item in find_details]
     result = list(set(result))
     return jsonify(result)
 
@@ -644,8 +638,7 @@ def get_one_event():  # 输入要查询的key和value 返回和那个节点相�
 
 @app.route('/del_oneevent', methods=["POST"])  # 删除一个事件的信息
 def to_del_oneevent():
-    name = request.json['事件名']
-    name = "S" + name
+    name = request.json['事件名称']
     graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % name)
     result = {}
     result['success'] = True
@@ -654,23 +647,23 @@ def to_del_oneevent():
 
 @app.route('/add_oneevent', methods=["POST"])  # 添加一个事件
 def to_add_oneevent():
-    name = request.form['事件名']
-    time = request.form['时间']
-    plane = request.form['客机型号']
-    airline = request.form['航空公司']
-    flightnum = request.form['航班号']
-    beginPlace = request.form['起飞地点']
-    landPlace = request.form['降落地点']
-    incidentPalce = request.form['出事地点']
-    evenType = request.form['事件类型']
-    airlineType = request.form['航线类型']
-    flightType = request.form['航班类型']
-    weather = request.form['天气情况']
-    stage = request.form['操作阶段']
-    reason = request.form['原因']
-    result = request.form['结果']
-    injured = request.form['人员伤亡']
-    grade = request.form['等级']
+    name = request.json['事件名称']
+    time = request.json['时间']
+    plane = request.json['客机型号']
+    airline = request.json['航空公司']
+    flightnum = request.json['航班号']
+    beginPlace = request.json['起飞地点']
+    landPlace = request.json['降落地点']
+    incidentPalce = request.json['出事地点']
+    evenType = request.json['事件类型']
+    airlineType = request.json['航线类型']
+    flightType = request.json['航班类型']
+    weather = request.json['天气情况']
+    stage = request.json['操作阶段']
+    reason = request.json['原因']
+    result = request.json['结果']
+    injured = request.json['人员伤亡']
+    grade = request.json['等级']
     addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
              evenType, airlineType, flightType, weather, stage, reason, result, injured, grade)
     return_result = {}
@@ -680,24 +673,24 @@ def to_add_oneevent():
 
 @app.route('/update_oneevent', methods=["POST"])  # 修改一个事件
 def to_update_oneevent():
-    name = request.form['事件名']
+    name = request.json['事件名称']
     graph.run("match(a:%s)  match (a)-[b]-() delete b delete a" % ("S"+name))
-    time = request.form['时间']
-    plane = request.form['客机型号']
-    airline = request.form['航空公司']
-    flightnum = request.form['航班号']
-    beginPlace = request.form['起飞地点']
-    landPlace = request.form['降落地点']
-    incidentPalce = request.form['出事地点']
-    evenType = request.form['事件类型']
-    airlineType = request.form['航线类型']
-    flightType = request.form['航班类型']
-    weather = request.form['天气情况']
-    stage = request.form['操作阶段']
-    reason = request.form['原因']
-    result = request.form['结果']
-    injured = request.form['人员伤亡']
-    grade = request.form['等级']
+    time = request.json['时间']
+    plane = request.json['客机型号']
+    airline = request.json['航空公司']
+    flightnum = request.json['航班号']
+    beginPlace = request.json['起飞地点']
+    landPlace = request.json['降落地点']
+    incidentPalce = request.json['出事地点']
+    evenType = request.json['事件类型']
+    airlineType = request.json['航线类型']
+    flightType = request.json['航班类型']
+    weather = request.json['天气情况']
+    stage = request.json['操作阶段']
+    reason = request.json['原因']
+    result = request.json['结果']
+    injured = request.json['人员伤亡']
+    grade = request.json['等级']
     addevent(name, time, plane, airline, flightnum, beginPlace, landPlace, incidentPalce,
              evenType, airlineType, flightType, weather, stage, reason, result, injured, grade)
     return_result = {}
@@ -732,10 +725,9 @@ def get_time_data():
 
 @app.route('/update_attr', methods=["POST"])
 def to_update_attr():
-    name = str(request.form['name'])
-    name = "S"+name
-    key = str(request.form['key'])
-    value = str(request.form['value'])
+    name = str(request.json['name'])
+    key = str(request.json['key'])
+    value = str(request.json['value'])
     sql = "match (a:%s) match (a)-[:属性{name:'%s'}]->(b) match (b)-[r]-() return count(r)" % (
         name, key)
     sql_re = graph.run(sql)
@@ -770,11 +762,11 @@ def to_update_attr():
     return_result['success'] = True
     return jsonify(return_result)
 
+
 @app.route('/delete_attr', methods=["POST"])
 def to_delete_attr():
-    name = str(request.form['name'])
-    name = "S"+name
-    key = str(request.form['key'])
+    name = str(request.json['name'])
+    key = str(request.json['key'])
     sql = "match (a:%s) match (a)-[r:属性{name:'%s'}]->(b) delete r" % (
         name, key)
     graph.run(sql)
