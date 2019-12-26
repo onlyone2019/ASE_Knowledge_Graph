@@ -1,190 +1,249 @@
-{% extends "base.html" %} {% block title %}{{ title }}{% endblock %}
-{% block inner_script %}
-    <script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script>
-    <script src="https://unpkg.com/@antv/data-set"></script>
+{% extends "base.html" %}
+
+{% block title %}数据统计{% endblock %}
+
+{% block outer_css %}
+<link
+	rel="stylesheet"
+	href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+/>
 {% endblock %}
-{% block outer_script %}
-    <script>
-        var jdata = []
-        $("button").click(function(){
-            $.get("/time_data", {from_time:2013, to_time:2016}, function(res){
-                chart.changeData(res);
-            })
-        });
-        const data = [
-        { time: '2013', grade: '一般', cnt: 32000 },
-        { time: '2013', grade: '重大', cnt: 30000 },
-        { time: '2013', grade: '严重', cnt: 27000 },
-        { time: '2013', grade: '特大', cnt: 24000 },
-        { time: '2013', grade: '事件', cnt: 24000 },
-        { time: '2013', grade: '事故', cnt: 24000 },
 
-        { time: '2014', grade: '一般', cnt: 35000 },
-        { time: '2014', grade: '重大', cnt: 32000 },
-        { time: '2014', grade: '严重', cnt: 30000 },
-        { time: '2014', grade: '特大', cnt: 27000 },
-        { time: '2014', grade: '事件', cnt: 24000 },
-        { time: '2014', grade: '事故', cnt: 24000 },
+{% block outer_script_in_head %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% endblock %}
 
-        { time: '2015', grade: '一般', cnt: 39000 },
-        { time: '2015', grade: '重大', cnt: 37000 },
-        { time: '2015', grade: '严重', cnt: 34000 },
-        { time: '2015', grade: '特大', cnt: 30000 },
-        { time: '2015', grade: '事件', cnt: 24000 },
-        { time: '2015', grade: '事故', cnt: 24000 },
+{% block inner_css %}
+<style>
+	/* general */
+	* {
+		margin: 0;
+		padding: 0;
+	}
 
-        { time: '2016', grade: '一般', cnt: 44000 },
-        { time: '2016', grade: '重大', cnt: 42000 },
-        { time: '2016', grade: '严重', cnt: 38000 },
-        { time: '2016', grade: '特大', cnt: 34000 },
-        { time: '2016', grade: '事件', cnt: 24000 },
-        { time: '2016', grade: '事故', cnt: 24000 },
+	a {
+		color: black;
+		text-decoration: none;
+	}
 
-        { time: '2017', grade: '一般', cnt: 47000 },
-        { time: '2017', grade: '重大', cnt: 44000 },
-        { time: '2017', grade: '严重', cnt: 40000 },
-        { time: '2017', grade: '特大', cnt: 36000 },
-        { time: '2017', grade: '事件', cnt: 24000 },
-        { time: '2017', grade: '事故', cnt: 24000 }
-        ];
+	a:hover {
+		text-decoration: none;
+	}
 
-        const chart = new G2.Chart({
-        container: 'container',
-        forceFit: true,
-        height: 800,
-        padding: [ 100, 100, 100, 50 ]
-        });
-        chart.source(data);
-        chart.scale('cnt', {
-        alias: '金额(元)'
-        });
-        chart.axis('time', {
-        label: {
-            textStyle: {
-            fill: '#aaaaaa'
-            }
-        },
-        tickLine: {
-            alignWithLabel: false,
-            length: 0
-        }
-        });
+	button {
+		cursor: pointer;
+	}
 
-        chart.axis('cnt', {
-        label: {
-            textStyle: {
-            fill: '#aaaaaa'
-            },
-            formatter: text => {
-            return text.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
-            }
-        },
-        title: {
-            offset: 80
-        }
-        });
-        chart.legend({
-        position: 'bottom'
-        });
-        chart.interval()
-        .position('time*cnt')
-        .color('grade', ['#FFFF00', '#FFCC00', '#FF9900', '#FF6600', '#FF3300', '#FF0000'])
-        .opacity(1);
-        chart.render();
-    </script>
+	button:hover {
+		outline: none;
+	}
+
+	[v-cloak] {
+		display: none;
+	}
+	/* general */
+
+	/* header */
+	.el-header {
+		padding: 0;
+		height: 66px !important;
+		position: fixed;
+		z-index: 10;
+		width: 100%;
+	}
+
+	.el-header li {
+		height: 63px !important;
+	}
+
+	.brand {
+		margin-right: 40px !important;
+		margin-left: 10px !important;
+		color: #fff !important;
+		font-size: 1.25rem;
+	}
+
+	.brand > img {
+		height: 40px;
+		margin-right: 5px;
+	}
+	/* header */
+
+	.chart-container {
+		margin-top: 63px;
+		padding: 40px;
+	}
+</style>
 {% endblock %}
 
 {% block main_content %}
-{% include "include/navbar.html" %}
-<div>
-    <button id="button">重绘</button>
-    <!-- 创建图表容器 -->
-    <div id="container"></div>
+<div id="app" v-cloak>
+	<el-container>
+		<el-header class="navbar">
+			<el-menu
+				:default-active="activeIndex"
+				class="el-menu"
+				mode="horizontal"
+				@select="handleSelect"
+				background-color="#343A40"
+				text-color="#999C9F"
+				active-text-color="#fff"
+			>
+				<el-menu-item index="1" class="brand">
+					<img
+						src="{{ url_for('static', filename='images/logo.svg') }}"
+						alt="Logo"
+					/>
+					ASE Knowledge Graph
+				</el-menu-item>
+				<el-menu-item index="2">首页</el-menu-item>
+				<el-menu-item index="3">事件检索</el-menu-item>
+				<el-menu-item index="4">模式图</el-menu-item>
+				<el-menu-item index="5">数据图</el-menu-item>
+				<el-menu-item index="6">数据统计</el-menu-item>
+				<el-menu-item index="7">帮助</el-menu-item>
+			</el-menu></el-header
+		>
+		<el-main class="chart-container">
+			<div style="text-align: center;">
+				<el-date-picker
+					v-model="startYear"
+					type="year"
+					placeholder="开始年份"
+					size="small"
+					value-format="yyyy"
+				>
+				</el-date-picker>
+				<span>&nbsp; 至 &nbsp;</span>
+				<el-date-picker
+					v-model="endYear"
+					type="year"
+					placeholder="结束年份"
+					size="small"
+					value-format="yyyy"
+				>
+				</el-date-picker>
+				<el-button
+					type="primary"
+					size="small"
+					plain
+					style="margin-left: 20px;"
+					@click="repaint()"
+					>重绘</el-button
+				>
+			</div>
+
+			<div id="container"></div>
+			<!-- 图表容器 -->
+		</el-main>
+	</el-container>
 </div>
+{% endblock %}
+
+{% block outer_script_in_body %}
+<script src="https://gw.alipayobjects.com/os/lib/antv/g2/3.4.10/dist/g2.min.js"></script>
+<script src="https://unpkg.com/@antv/data-set"></script>
 {% endblock %}
 
 {% block inner_script_in_body %}
 <script>
-	const data = [
-		{ time: "03-19", type: "101-1000", value: 32000 },
-		{ time: "03-19", type: "31-100", value: 30000 },
-		{ time: "03-19", type: "11-30", value: 27000 },
-		{ time: "03-19", type: "1-10", value: 24000 },
+	let vm = new Vue({
+		el: "#app",
+		data: {
+			activeIndex: "6", // 当前活动页面（从 1 开始）
+			navbarUrl: [
+				"/",
+				"/",
+				"/event_search",
+				"/pattern",
+				"/data_graph",
+				"/statistics",
+				"#"
+			],
 
-		{ time: "03-20", type: "101-1000", value: 35000 },
-		{ time: "03-20", type: "31-100", value: 32000 },
-		{ time: "03-20", type: "11-30", value: 30000 },
-		{ time: "03-20", type: "1-10", value: 27000 },
+			startYear: "2012",
+			endYear: "2016",
 
-		{ time: "03-21", type: "101-1000", value: 39000 },
-		{ time: "03-21", type: "31-100", value: 37000 },
-		{ time: "03-21", type: "11-30", value: 34000 },
-		{ time: "03-21", type: "1-10", value: 30000 },
-
-		{ time: "03-22", type: "101-1000", value: 44000 },
-		{ time: "03-22", type: "31-100", value: 42000 },
-		{ time: "03-22", type: "11-30", value: 38000 },
-		{ time: "03-22", type: "1-10", value: 34000 },
-
-		{ time: "03-23", type: "101-1000", value: 47000 },
-		{ time: "03-23", type: "31-100", value: 44000 },
-		{ time: "03-23", type: "11-30", value: 40000 },
-		{ time: "03-23", type: "1-10", value: 36000 },
-
-		{ time: "03-24", type: "101-1000", value: 48000 },
-		{ time: "03-24", type: "31-100", value: 46000 },
-		{ time: "03-24", type: "11-30", value: 42000 },
-		{ time: "03-24", type: "1-10", value: 38000 },
-
-		{ time: "03-25", type: "101-1000", value: 50000 },
-		{ time: "03-25", type: "31-100", value: 48000 },
-		{ time: "03-25", type: "11-30", value: 44000 },
-		{ time: "03-25", type: "1-10", value: 38000 }
-	];
-
-	const chart = new G2.Chart({
-		container: "container",
-		forceFit: true,
-		height: 800,
-		padding: [20, 70, 50, 50]
-	});
-	chart.source(data);
-	chart.scale("value", {
-		alias: "金额(元)"
-	});
-	chart.axis("time", {
-		label: {
-			textStyle: {
-				fill: "#aaaaaa"
-			}
+			chart: null
 		},
-		tickLine: {
-			alignWithLabel: false,
-			length: 0
-		}
-	});
 
-	chart.axis("value", {
-		label: {
-			textStyle: {
-				fill: "#aaaaaa"
+		methods: {
+			/* 点击导航栏时触发 */
+			handleSelect(key) {
+				location.href = this.navbarUrl[Number(key) - 1];
 			},
-			formatter: text => {
-				return text.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+
+			/* 重绘图表 */
+			repaint() {
+				axios
+					.get(`/time_data?from_time=${this.startYear}&to_time=${this.endYear}`)
+					.then(function(rsp) {
+						chart.changeData(rsp.data);
+					});
 			}
 		},
-		title: {
-			offset: 80
+
+		mounted() {
+			axios
+				.get(`/time_data?from_time=${this.startYear}&to_time=${this.endYear}`)
+				.then(function(rsp) {
+					let data = rsp.data;
+
+					chart = new G2.Chart({
+						container: "container",
+						forceFit: true,
+						height: 800,
+						padding: [100, 100, 100, 50]
+					});
+					chart.source(data);
+					chart.scale("cnt", {
+						alias: "金额(元)"
+					});
+					chart.axis("time", {
+						label: {
+							textStyle: {
+								fill: "#aaaaaa"
+							}
+						},
+						tickLine: {
+							alignWithLabel: false,
+							length: 0
+						}
+					});
+					chart.axis("cnt", {
+						label: {
+							textStyle: {
+								fill: "#aaaaaa"
+							},
+							formatter: text => {
+								return text.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+							}
+						},
+						title: {
+							offset: 80
+						}
+					});
+					chart.legend({
+						position: "bottom"
+					});
+					chart
+						.interval()
+						.position("time*cnt")
+						.color("grade", [
+							"#FFFF00",
+							"#FFCC00",
+							"#FF9900",
+							"#FF6600",
+							"#FF3300",
+							"#FF0000"
+						])
+						.opacity(1);
+
+					chart.render();
+				});
 		}
 	});
-	chart.legend({
-		position: "right-center"
-	});
-	chart
-		.interval()
-		.position("time*value")
-		.color("type", ["#40a9ff", "#1890ff", "#096dd9", "#0050b3"])
-		.opacity(1);
-	chart.render();
 </script>
 {% endblock %}
