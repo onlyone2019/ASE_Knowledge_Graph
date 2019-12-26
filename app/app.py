@@ -286,7 +286,7 @@ def get_pattern_bottom():
 @app.route("/index")
 @app.route("/")
 def index():
-    return render_template("index.html", title='首页', active=1)
+    return render_template("index.html")
 
 
 @app.route("/event_search")

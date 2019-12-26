@@ -1,674 +1,670 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<title>事件检索</title>
-		<link
-			rel="shortcut icon"
-			href="{{ url_for('static', filename='images/favicon.png') }}"
-		/>
-		<link
-			rel="icon"
-			href="{{ url_for('static', filename='images/favicon.png') }}"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
-		/>
-		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% extends "base.html" %}
 
-		<style>
-			/* general */
-			* {
-				margin: 0;
-				padding: 0;
-			}
+{% block title %}事件检索{% endblock %}
 
-			a {
-				color: black;
-				text-decoration: none;
-			}
+{% block outer_css %}
+<link
+	rel="stylesheet"
+	href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+/>
+{% endblock %}
 
-			a:hover {
-				text-decoration: none;
-			}
+{% block outer_script_in_head %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% endblock %}
 
-			button {
-				cursor: pointer;
-			}
+{% block inner_css %}
+<style>
+	/* general */
+	* {
+		margin: 0;
+		padding: 0;
+	}
 
-			button:hover {
-				outline: none;
-			}
+	a {
+		color: black;
+		text-decoration: none;
+	}
 
-			[v-cloak] {
-				display: none;
-			}
-			/* general */
+	a:hover {
+		text-decoration: none;
+	}
 
-			/* header */
-			.el-header {
-				padding: 0;
-				height: 66px !important;
-				position: fixed;
-				z-index: 10;
-				width: 100%;
-			}
+	button {
+		cursor: pointer;
+	}
 
-			.el-header li {
-				height: 63px !important;
-			}
+	button:hover {
+		outline: none;
+	}
 
-			#brand {
-				margin-right: 40px;
-				margin-left: 10px;
-				color: #fff;
-				font-size: 1.25rem;
-			}
+	[v-cloak] {
+		display: none;
+	}
+	/* general */
 
-			#brand > img {
-				height: 40px;
-				margin-right: 5px;
-			}
-			/* header */
+	/* header */
+	.el-header {
+		padding: 0;
+		height: 66px !important;
+		position: fixed;
+		z-index: 10;
+		width: 100%;
+	}
 
-			/* aside and main */
-			.aside-and-main {
-				margin-top: 66px;
-			}
+	.el-header li {
+		height: 63px !important;
+	}
 
-			.aside-panel {
-				background-color: #f7f9fc;
-				min-height: 100%;
-				width: 25%;
-				position: fixed;
-				padding: 70px 40px 30px 40px;
-				text-align: center;
-			}
+	.brand {
+		margin-right: 40px !important;
+		margin-left: 10px !important;
+		color: #fff !important;
+		font-size: 1.25rem;
+	}
 
-			.event-card-container {
-				width: 75%;
-				position: absolute;
-				right: 0;
-				min-height: 100%;
-				padding: 50px 70px 30px 70px;
-			}
-			/* aside and main */
+	.brand > img {
+		height: 40px;
+		margin-right: 5px;
+	}
+	/* header */
 
-			.el-image__error {
-				height: 150px;
-			}
+	/* aside and main */
+	.aside-and-main {
+		margin-top: 63px;
+	}
 
-			.el-dialog__header {
-				padding-top: 50px;
-			}
+	.aside-panel {
+		background-color: #f7f9fc;
+		min-height: 100%;
+		width: 25%;
+		position: fixed;
+		padding: 70px 40px 30px 40px;
+		text-align: center;
+	}
 
-			.el-dialog__title {
-				font-size: 1.7rem;
-				color: #409eff;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="app" v-cloak>
-			<el-container>
-				<el-header>
-					<el-menu
-						:default-active="activeIndex"
-						class="el-menu"
-						mode="horizontal"
-						@select="handleSelect"
-						background-color="#343A40"
-						text-color="#999C9F"
-						active-text-color="#fff"
+	.event-card-container {
+		width: 75%;
+		position: absolute;
+		right: 0;
+		min-height: 100%;
+		padding: 50px 70px 30px 70px;
+	}
+	/* aside and main */
+
+	.el-image__error {
+		height: 150px;
+	}
+
+	.el-dialog__header {
+		padding-top: 50px;
+	}
+
+	.el-dialog__title {
+		font-size: 1.7rem;
+		color: #409eff;
+	}
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div id="app" v-cloak>
+	<el-container>
+		<el-header>
+			<el-menu
+				:default-active="activeIndex"
+				class="el-menu"
+				mode="horizontal"
+				@select="handleSelect"
+				background-color="#343A40"
+				text-color="#999C9F"
+				active-text-color="#fff"
+			>
+				<el-menu-item index="1" class="brand">
+					<img
+						src="{{ url_for('static', filename='images/logo.svg') }}"
+						alt="Logo"
+					/>
+					ASE Knowledge Graph
+				</el-menu-item>
+				<el-menu-item index="2">首页</el-menu-item>
+				<el-menu-item index="3">事件检索</el-menu-item>
+				<el-menu-item index="4">模式图</el-menu-item>
+				<el-menu-item index="5">数据图</el-menu-item>
+				<el-menu-item index="6">数据统计</el-menu-item>
+				<el-menu-item index="7">帮助</el-menu-item>
+			</el-menu></el-header
+		>
+		<el-container class="aside-and-main">
+			<el-aside width="25%" class="aside-panel">
+				<el-select
+					@change="queryBasisChange()"
+					v-model="queryBasisValue"
+					style="
+						width: 100%;
+						margin-bottom: 5px;"
+					clearable
+					filterable
+					default-first-option
+					:loading="queryBasisLoading"
+					:placeholder="queryBasisPlaceholder"
+				>
+					<el-option
+						v-for="item in queryBasisOptions"
+						:key="item"
+						:label="item"
+						:value="item"
 					>
-						<el-menu-item index="1">
-							<a href="/" id="brand">
-								<img
-									src="{{ url_for('static', filename='images/logo.svg') }}"
-									alt="Logo"
-								/>
-								ASE Knowledge Graph
-							</a></el-menu-item
+					</el-option>
+				</el-select>
+				<div>
+					<el-input
+						v-if="valueBoxType === 'search'"
+						placeholder="search..."
+						suffix-icon="el-icon-search"
+						v-model="searchInputValue"
+					>
+					</el-input>
+					<el-select
+						v-else-if="valueBoxType === 'select'"
+						v-model="specificChoiceValue"
+						style="width: 100%;"
+						clearable
+						filterable
+						default-first-option
+						:loading="specificChoiceLoading"
+						:placeholder="specificChoicePlaceholder"
+					>
+						<el-option
+							v-for="item in specificChoiceOptions"
+							:key="item"
+							:label="item"
+							:value="item"
 						>
-						<el-menu-item index="2"><a href="/">首页</a></el-menu-item>
-						<el-menu-item index="3"
-							><a href="/event_search">事件检索</a></el-menu-item
-						>
-						<el-menu-item index="4"><a href="/pattern">模式图</a></el-menu-item>
-						<el-menu-item index="5"
-							><a href="/data_graph">数据图</a></el-menu-item
-						>
-						<el-menu-item index="6"
-							><a href="/statistics">数据统计</a></el-menu-item
-						>
-						<el-menu-item index="7"><a href="#">帮助</a></el-menu-item>
-					</el-menu></el-header
+						</el-option>
+					</el-select>
+					<el-date-picker
+						v-else
+						v-model="dateSelectValue"
+						style="width: 100%;"
+						type="date"
+						placeholder="选择日期"
+						format="yyyy 年 MM 月 dd 日"
+						value-format="yyyyMMdd"
+					>
+					</el-date-picker>
+				</div>
+				<el-button
+					type="primary"
+					plain
+					@click="searchEventIntro()"
+					style="
+						margin-top: 40px;
+						width: 100%;
+						display: block"
+					>查询</el-button
 				>
-				<el-container class="aside-and-main">
-					<el-aside width="25%" class="aside-panel">
-						<el-select
-							@change="queryBasisChange()"
-							v-model="queryBasisValue"
-							style="
-								width: 100%;
-								margin-bottom: 5px;"
-							clearable
-							filterable
-							default-first-option
-							:loading="queryBasisLoading"
-							:placeholder="queryBasisPlaceholder"
-						>
-							<el-option
-								v-for="item in queryBasisOptions"
-								:key="item"
-								:label="item"
-								:value="item"
-							>
-							</el-option>
-						</el-select>
-						<div>
-							<el-input
-								v-if="valueBoxType === 'search'"
-								placeholder="search..."
-								suffix-icon="el-icon-search"
-								v-model="searchInputValue"
-							>
-							</el-input>
-							<el-select
-								v-else-if="valueBoxType === 'select'"
-								v-model="specificChoiceValue"
-								style="width: 100%;"
-								clearable
-								filterable
-								default-first-option
-								:loading="specificChoiceLoading"
-								:placeholder="specificChoicePlaceholder"
-							>
-								<el-option
-									v-for="item in specificChoiceOptions"
-									:key="item"
-									:label="item"
-									:value="item"
-								>
-								</el-option>
-							</el-select>
-							<el-date-picker
-								v-else
-								v-model="dateSelectValue"
-								style="width: 100%;"
-								type="date"
-								placeholder="选择日期"
-								format="yyyy 年 MM 月 dd 日"
-								value-format="yyyyMMdd"
-							>
-							</el-date-picker>
-						</div>
-						<el-button
-							type="primary"
-							plain
-							@click="searchEventIntro()"
-							style="
-								margin-top: 40px;
-								width: 100%;
-								display: block"
-							>查询</el-button
-						>
-						<el-button
-							type="info"
-							icon="el-icon-plus"
-							@click="dialogForAddVisible = true"
-							style="
-								display: inline-block;
-								margin-top: 100px;
-								width: 66px;
-								height: 66px;"
-							plain
-							circle
-						></el-button>
-					</el-aside>
-					<el-main class="event-card-container">
-						<el-row
-							:gutter="30"
-							v-for="(event, index) in eventsIntro"
-							v-if="index % 3 == 0"
-							style="margin-bottom: 15px;"
-						>
-							<el-col
-								:span="8"
-								v-for="event in eventsIntro.slice(index, index + 3)"
-								:key="event.事件名称"
-							>
-								<el-card shadow="hover" :body-style="{ padding: '0px' }">
-									<el-image
-										:src="event.客机型号 | imgPath"
-										style="
-											width: 100%;
-											display: block;"
-									></el-image>
-									<div style="padding: 20px 25px;">
-										{% raw %}
-										<h1
-											style="
-												font-size: 1.8rem;
-												text-align: center;
-												color: #28A745;
-												font-weight: normal;
-												margin-bottom: 10px;
-												"
-										>
-											{{ event.事件名称 }}
-										</h1>
-										<el-row v-for="(value, key) in event">
-											<div v-if="key != '事件名称'">
-												<el-col :span="12" style="text-align: right;"
-													>{{ key + "：" }}</el-col
-												>
-												<el-col :span="12" style="text-align: left;"
-													>{{ value }}</el-col
-												>
-											</div>
-										</el-row>
-										{% endraw %}
-										<el-row
-											style="
-											text-align: center;
-											margin-top: 20px;"
-										>
-											<el-button
-												type="danger"
-												size="small"
-												plain
-												@click="deleteEvent(event)"
-												>删除</el-button
-											>
-											<el-button
-												type="primary"
-												size="small"
-												plain
-												@click="showAndUpdateCardDetails(event.事件名称)"
-												>查看 / 修改</el-button
-											>
-										</el-row>
-									</div>
-								</el-card>
-							</el-col>
-						</el-row>
-						<el-pagination
-							@current-change="pagerCurrentChange"
-							:current-page.sync="currentPage"
-							:page-size="pageSize"
-							:page-count="pageCount"
-							:pager-count="pagerCount"
-							layout="prev, pager, next, jumper"
-							hide-on-single-page
-							style="
-								text-align: center;
-								margin-top: 50px;"
-						>
-						</el-pagination>
-					</el-main>
-				</el-container>
-				<el-dialog
-					:title="dialogForShowTitle"
-					:visible.sync="dialogForShowVisible"
-					center
+				<el-button
+					type="info"
+					icon="el-icon-plus"
+					@click="dialogForAddVisible = true"
+					style="
+						display: inline-block;
+						margin-top: 100px;
+						width: 66px;
+						height: 66px;"
+					plain
+					circle
+				></el-button>
+			</el-aside>
+			<el-main class="event-card-container">
+				<el-row
+					:gutter="30"
+					v-for="(event, index) in eventsIntro"
+					v-if="index % 3 == 0"
+					style="margin-bottom: 15px;"
 				>
-					<el-table :data="dialogForShowData">
-						<el-table-column property="key" label="属性"></el-table-column>
-						<el-table-column property="value" label="值">
-							<template slot-scope="scope">
-								<el-input
-									v-model="scope.row.value"
-									v-if="scope.row.valueBoxIsInput"
-									size="mini"
-								></el-input>
+					<el-col
+						:span="8"
+						v-for="event in eventsIntro.slice(index, index + 3)"
+						:key="event.事件名称"
+					>
+						<el-card shadow="hover" :body-style="{ padding: '0px' }">
+							<el-image
+								:src="event.客机型号 | imgPath"
+								style="
+									width: 100%;
+									display: block;"
+							></el-image>
+							<div style="padding: 20px 25px;">
 								{% raw %}
-								<span v-else>{{ scope.row.value }}</span>
+								<h1
+									style="
+										font-size: 1.8rem;
+										text-align: center;
+										color: #28A745;
+										font-weight: normal;
+										margin-bottom: 10px;
+										"
+								>
+									{{ event.事件名称 }}
+								</h1>
+								<el-row v-for="(value, key) in event">
+									<div v-if="key != '事件名称'">
+										<el-col :span="12" style="text-align: right;"
+											>{{ key + "：" }}</el-col
+										>
+										<el-col :span="12" style="text-align: left;"
+											>{{ value }}</el-col
+										>
+									</div>
+								</el-row>
 								{% endraw %}
-							</template>
-						</el-table-column>
-						<el-table-column property="button" label="操作" align="center">
-							<template slot-scope="scope">
-								<el-button
-									size="mini"
-									circle
-									:type="scope.row.button1Type"
-									@click="dialogForShowButton1Clicked(scope.$index, scope.row)"
-									:icon="scope.row.button1Icon"
-								></el-button>
-								<el-button
-									size="mini"
-									circle
-									type="danger"
-									@click="dialogForShowButton2Clicked(scope.$index, scope.row)"
-									icon="el-icon-delete"
-								></el-button>
-							</template>
-						</el-table-column>
-					</el-table>
-				</el-dialog>
-				<el-dialog
-					title="添加航空安全事件"
-					:visible.sync="dialogForAddVisible"
-					center
+								<el-row
+									style="
+									text-align: center;
+									margin-top: 20px;"
+								>
+									<el-button
+										type="danger"
+										size="small"
+										plain
+										@click="deleteEvent(event)"
+										>删除</el-button
+									>
+									<el-button
+										type="primary"
+										size="small"
+										plain
+										@click="showAndUpdateCardDetails(event.事件名称)"
+										>查看 / 修改</el-button
+									>
+								</el-row>
+							</div>
+						</el-card>
+					</el-col>
+				</el-row>
+				<el-pagination
+					@current-change="pagerCurrentChange"
+					:current-page.sync="currentPage"
+					:page-size="pageSize"
+					:page-count="pageCount"
+					:pager-count="pagerCount"
+					layout="prev, pager, next, jumper"
+					hide-on-single-page
+					style="
+						text-align: center;
+						margin-top: 50px;"
 				>
-					<el-table :data="dialogForAddData">
-						<el-table-column property="key" label="属性"></el-table-column>
-						<el-table-column property="value" label="值" align="center">
-							<template slot-scope="scope">
-								<el-input v-model="scope.row.value" size="small"></el-input>
-							</template>
-						</el-table-column>
-					</el-table>
-					<div style="margin: 30px auto; text-align: right;">
-						<el-button @click="dialogForAddVisible = false">取消</el-button>
-						<el-button type="primary" @click="addEvent()">提交</el-button>
-					</div>
-				</el-dialog>
-			</el-container>
-		</div>
-		<script>
-			let vm = new Vue({
-				el: "#app",
-				data: {
-					/*** 关于事件名称加不加 S 的问题，约定为前端存储和展示时不加 S，与后端通信时加上 S。 ***/
+				</el-pagination>
+			</el-main>
+		</el-container>
+		<el-dialog
+			:title="dialogForShowTitle"
+			:visible.sync="dialogForShowVisible"
+			center
+		>
+			<el-table :data="dialogForShowData">
+				<el-table-column property="key" label="属性"></el-table-column>
+				<el-table-column property="value" label="值">
+					<template slot-scope="scope">
+						<el-input
+							v-model="scope.row.value"
+							v-if="scope.row.valueBoxIsInput"
+							size="mini"
+						></el-input>
+						{% raw %}
+						<span v-else>{{ scope.row.value }}</span>
+						{% endraw %}
+					</template>
+				</el-table-column>
+				<el-table-column property="button" label="操作" align="center">
+					<template slot-scope="scope">
+						<el-button
+							size="mini"
+							circle
+							:type="scope.row.button1Type"
+							@click="dialogForShowButton1Clicked(scope.$index, scope.row)"
+							:icon="scope.row.button1Icon"
+						></el-button>
+						<el-button
+							size="mini"
+							circle
+							type="danger"
+							@click="dialogForShowButton2Clicked(scope.$index, scope.row)"
+							icon="el-icon-delete"
+						></el-button>
+					</template>
+				</el-table-column>
+			</el-table>
+		</el-dialog>
+		<el-dialog
+			title="添加航空安全事件"
+			:visible.sync="dialogForAddVisible"
+			center
+		>
+			<el-table :data="dialogForAddData">
+				<el-table-column property="key" label="属性"></el-table-column>
+				<el-table-column property="value" label="值" align="center">
+					<template slot-scope="scope">
+						<el-input v-model="scope.row.value" size="small"></el-input>
+					</template>
+				</el-table-column>
+			</el-table>
+			<div style="margin: 30px auto; text-align: right;">
+				<el-button @click="dialogForAddVisible = false">取消</el-button>
+				<el-button type="primary" @click="addEvent()">提交</el-button>
+			</div>
+		</el-dialog>
+	</el-container>
+</div>
+{% endblock %}
 
-					activeIndex: "3", // 当前活动页面（从 1 开始）
+{% block inner_script_in_body %}
+<script>
+	let vm = new Vue({
+		el: "#app",
+		data: {
+			/*** 关于事件名称加不加 S 的问题，约定为前端存储和展示时不加 S，与后端通信时加上 S。 ***/
 
-					/* queryBasis: 查询依据 */
-					queryBasisLoading: true,
-					queryBasisPlaceholder: "选择查询依据",
-					queryBasisValue: "",
-					queryBasisOptions: [],
+			activeIndex: "3", // 当前活动页面（从 1 开始）
+			navbarUrl: [
+				"/",
+				"/",
+				"/event_search",
+				"/pattern",
+				"/data_graph",
+				"/statistics",
+				"#"
+			],
 
-					valueBoxType: "search",
-					specificChoiceLoading: true,
-					specificChoicePlaceholder: "",
-					specificChoiceOptions: [],
-					specificChoiceValue: "",
-					dateSelectValue: "",
-					searchInputValue: "",
+			/* queryBasis: 查询依据 */
+			queryBasisLoading: true,
+			queryBasisPlaceholder: "选择查询依据",
+			queryBasisValue: "",
+			queryBasisOptions: [],
 
-					eventsIntro: [], // 事件简介
+			valueBoxType: "search",
+			specificChoiceLoading: true,
+			specificChoicePlaceholder: "",
+			specificChoiceOptions: [],
+			specificChoiceValue: "",
+			dateSelectValue: "",
+			searchInputValue: "",
 
-					/* 分页器 */
-					currentPage: 1,
-					pageSize: 15,
-					pageCount: 0, // 页数
-					pagerCount: 15, // 分页器的按钮个数
-					pagerRequestUrl: "/all_events_intro?page=", // 分页器换页时向哪个 URL 发请求
+			eventsIntro: [], // 事件简介
 
-					/* 用来展示和修改事件的弹出框 */
-					dialogForShowTitle: "",
-					dialogForShowVisible: false,
-					dialogForShowData: [
-						{
-							key: "",
-							value: "",
-							button1Type: "primary",
-							button1Icon: "el-icon-edit",
-							valueBoxIsInput: false
-						}
-					],
+			/* 分页器 */
+			currentPage: 1,
+			pageSize: 15,
+			pageCount: 0, // 页数
+			pagerCount: 15, // 分页器的按钮个数
+			pagerRequestUrl: "/all_events_intro?page=", // 分页器换页时向哪个 URL 发请求
 
-					/* 用来添加事件的弹出框 */
-					dialogForAddVisible: false,
-					dialogForAddData: []
-				},
+			/* 用来展示和修改事件的弹出框 */
+			dialogForShowTitle: "",
+			dialogForShowVisible: false,
+			dialogForShowData: [
+				{
+					key: "",
+					value: "",
+					button1Type: "primary",
+					button1Icon: "el-icon-edit",
+					valueBoxIsInput: false
+				}
+			],
 
-				methods: {
-					/* 在事件名前 加/移除 S。在其他 methods 中使用 */
-					addS(eventName) {
-						return "S" + eventName;
-					},
-					removeS(eventName) {
-						return eventName.slice(1, eventName.length);
-					},
+			/* 用来添加事件的弹出框 */
+			dialogForAddVisible: false,
+			dialogForAddData: []
+		},
 
-					/* 添加一个事件 */
-					addEvent() {
-						let data = {};
-						for (let i of this.dialogForAddData) data[i.key] = i.value.trim();
-						if (data.事件名称 === "" || data.时间 == "") {
-							this.$message.error("事件名称 和 时间 为必填项！");
-							return;
-						}
-						data.事件名称 = this.addS(data.事件名称);
-						axios
-							.post("/add_oneevent", data)
-							.then(rsp => {
-								if (rsp.data["success"] == true) {
-									this.dialogForAddVisible = false;
-									this.$message.success("添加成功！");
-									this.dialogForAddData = this.dialogForAddData.map(item => {
-										item.value = "";
-										return item;
-									});
-								} else this.$message.error("添加失败！");
-							})
-							.catch(error => {
-								this.$message.error("添加失败！");
-							});
-					},
+		methods: {
+			/* 在事件名前 加/移除 S。在其他 methods 中使用 */
+			addS(eventName) {
+				return "S" + eventName;
+			},
+			removeS(eventName) {
+				return eventName.slice(1, eventName.length);
+			},
 
-					/* 点击卡片上的 “删除” 按钮触发此方法 */
-					deleteEvent(event) {
-						axios
-							.post("/del_oneevent", {
-								事件名称: this.addS(event.事件名称.trim())
-							})
-							.then(rsp => {
-								if (rsp.data.success == true) {
-									this.eventsIntro.splice(this.eventsIntro.indexOf(event), 1);
-									this.$message.success("删除成功！");
-								} else this.$message.error("删除失败！");
-							})
-							.catch(error => {
-								this.$message.error("删除失败！");
-							});
-					},
+			/* 点击导航栏时触发 */
+			handleSelect(key) {
+				location.href = this.navbarUrl[Number(key) - 1];
+			},
 
-					/* 点击卡片上的 “查看 / 修改” 按钮触发此方法*/
-					showAndUpdateCardDetails(eventName) {
-						this.dialogForShowTitle = eventName;
-						this.dialogForShowVisible = true;
-						let data = {};
-						axios
-							.all([
-								axios.get("/pattern_bottom"),
-								axios.get("/event_info?event_name=S" + eventName)
-							])
-							.then(
-								axios.spread((rsp1, rsp2) => {
-									for (let i of rsp1.data) data[i] = "";
-									for (let i in rsp2.data) data[i] = rsp2.data[i];
-									data["事件名称"] = this.removeS(data["事件名称"]);
-									this.dialogForShowData = [];
-									for (let i in data) {
-										// 不允许修改事件名称
-										if (i == "事件名称") continue;
-										let row = {};
-										row["key"] = i;
-										row["value"] = data[i];
-										row["button1Type"] = "primary";
-										row["button1Icon"] = "el-icon-edit";
-										row["valueBoxIsInput"] = false;
-										this.dialogForShowData.push(row);
-									}
-								})
-							)
-							.catch(error => {
-								this.$message.error("error! 请检查网络连接");
-							});
-					},
-
-					/* 点击 dialog 一行中的第一个 button 触发此方法 */
-					dialogForShowButton1Clicked(index, row) {
-						if (row.button1Type === "primary") {
-							row.button1Type = "success";
-							row.button1Icon = "el-icon-check";
-							row.valueBoxIsInput = true;
-						} else {
-							row.button1Type = "primary";
-							row.button1Icon = "el-icon-edit";
-							row.valueBoxIsInput = false;
-							axios
-								.post("/update_attr", {
-									name: this.addS(this.dialogForShowTitle),
-									key: row.key,
-									value: row.value
-								})
-								.then(rsp => {
-									if (rsp.data["success"] == true) {
-										this.$message.success("修改成功！");
-										this.dialogForShowData[index].value = row.value;
-									} else this.$message.error("修改失败！");
-								})
-								.catch(error => {
-									this.$message.error("修改失败！");
-								});
-						}
-					},
-
-					/* 点击 dialog 一行中的删除按钮触发此方法 */
-					dialogForShowButton2Clicked(index, row) {
-						axios
-							.post("/delete_attr", {
-								name: this.addS(this.dialogForShowTitle),
-								key: row.key
-							})
-							.then(rsp => {
-								if (rsp.data["success"] == true) {
-									this.$message.success("删除成功！");
-									this.dialogForShowData[index].value = "";
-								} else this.$message.error("删除失败！");
-							})
-							.catch(error => {
-								this.$message.error("删除失败！");
-							});
-					},
-
-					handleSelect(key, keyPath) {
-						console.log(key, keyPath);
-					},
-
-					/* 查询依据改变时触发此方法 */
-					queryBasisChange() {
-						this.searchInputValue = this.specificChoiceValue = this.dateSelectValue =
-							""; // 清空输入框的内容
-						this.currentPage = 1; // 页面回到 1
-						if (
-							this.queryBasisValue === "原因" ||
-							this.queryBasisValue === "结果"
-						)
-							this.valueBoxType = "search";
-						else if (this.queryBasisValue === "时间")
-							this.valueBoxType = "date";
-						else {
-							this.specificChoiceLoading = true;
-							this.valueBoxType = "select";
-							this.specificChoicePlaceholder = "选择" + this.queryBasisValue;
-							axios
-								.get("/all_detail?key=" + this.queryBasisValue)
-								.then(rsp => {
-									if (this.queryBasisValue === "事件名称")
-										this.specificChoiceOptions = rsp.data.map(item =>
-											this.removeS(item)
-										);
-									else this.specificChoiceOptions = rsp.data;
-									this.specificChoiceLoading = false;
-								})
-								.catch(error => {
-									this.$message.error("error! 请检查网络连接");
-								});
-						}
-					},
-
-					/* 点击 “查询” 按钮时触发此方法 */
-					searchEventIntro() {
-						let key = this.queryBasisValue;
-						let value;
-						if (this.valueBoxType === "search") value = this.searchInputValue;
-						else if (this.valueBoxType === "date") value = this.dateSelectValue;
-						else value = this.specificChoiceValue;
-						if (key === "事件名称") value = this.addS(value);
-						this.pagerRequestUrl = `/events_intro?key=${key}&value=${value}&page=`;
-						axios
-							.get(this.pagerRequestUrl + "1")
-							.then(rsp => {
-								this.pageCount = rsp.data.pop()["page_num"];
-								this.eventsIntro = rsp.data.map(item => {
-									item["事件名称"] = this.removeS(item["事件名称"]);
-									return item;
-								});
-							})
-							.catch(error => {
-								this.$message.error("error! 请检查网络连接");
-							});
-					},
-
-					/* 页码变化时触发此方法 */
-					pagerCurrentChange(val) {
-						axios
-							.get(this.pagerRequestUrl + val)
-							.then(rsp => {
-								this.pageCount = rsp.data.pop()["page_num"];
-								this.eventsIntro = rsp.data.map(item => {
-									item["事件名称"] = this.removeS(item["事件名称"]);
-									return item;
-								});
-							})
-							.catch(error => {
-								this.$message.error("error! 请检查网络连接");
-							});
-					}
-				},
-
-				filters: {
-					/* 将航班号过滤为图片路径 */
-					imgPath(planeType) {
-						return "/static/aircrafts/" + planeType.trim() + ".jpeg";
-					}
-				},
-
-				mounted() {
-					axios
-						.get("/pattern_bottom")
-						.then(rsp => {
-							let data = rsp.data;
-							data.unshift("事件名称");
-							for (let i of data) {
-								let row = {};
-								row.key = i;
-								row.value = "";
-								this.dialogForAddData.push(row);
-							}
-							data.splice(data.indexOf("人员伤亡"), 1);
-							this.queryBasisOptions = data;
-							this.queryBasisLoading = false;
-						})
-						.catch(error => {
-							this.$message.error("error! 请检查网络连接");
-						});
-					axios
-						.get(this.pagerRequestUrl + "1")
-						.then(rsp => {
-							this.pageCount = rsp.data.pop()["page_num"];
-							this.eventsIntro = rsp.data.map(item => {
-								item["事件名称"] = this.removeS(item["事件名称"]);
+			/* 添加一个事件 */
+			addEvent() {
+				let data = {};
+				for (let i of this.dialogForAddData) data[i.key] = i.value.trim();
+				if (data.事件名称 === "" || data.时间 == "") {
+					this.$message.error("事件名称 和 时间 为必填项！");
+					return;
+				}
+				data.事件名称 = this.addS(data.事件名称);
+				axios
+					.post("/add_oneevent", data)
+					.then(rsp => {
+						if (rsp.data["success"] == true) {
+							this.dialogForAddVisible = false;
+							this.$message.success("添加成功！");
+							this.dialogForAddData = this.dialogForAddData.map(item => {
+								item.value = "";
 								return item;
 							});
+						} else this.$message.error("添加失败！");
+					})
+					.catch(error => {
+						this.$message.error("添加失败！");
+					});
+			},
+
+			/* 点击卡片上的 “删除” 按钮触发此方法 */
+			deleteEvent(event) {
+				axios
+					.post("/del_oneevent", {
+						事件名称: this.addS(event.事件名称.trim())
+					})
+					.then(rsp => {
+						if (rsp.data.success == true) {
+							this.eventsIntro.splice(this.eventsIntro.indexOf(event), 1);
+							this.$message.success("删除成功！");
+						} else this.$message.error("删除失败！");
+					})
+					.catch(error => {
+						this.$message.error("删除失败！");
+					});
+			},
+
+			/* 点击卡片上的 “查看 / 修改” 按钮触发此方法*/
+			showAndUpdateCardDetails(eventName) {
+				this.dialogForShowTitle = eventName;
+				this.dialogForShowVisible = true;
+				let data = {};
+				axios
+					.all([
+						axios.get("/pattern_bottom"),
+						axios.get("/event_info?event_name=S" + eventName)
+					])
+					.then(
+						axios.spread((rsp1, rsp2) => {
+							for (let i of rsp1.data) data[i] = "";
+							for (let i in rsp2.data) data[i] = rsp2.data[i];
+							data["事件名称"] = this.removeS(data["事件名称"]);
+							this.dialogForShowData = [];
+							for (let i in data) {
+								// 不允许修改事件名称
+								if (i == "事件名称") continue;
+								let row = {};
+								row["key"] = i;
+								row["value"] = data[i];
+								row["button1Type"] = "primary";
+								row["button1Icon"] = "el-icon-edit";
+								row["valueBoxIsInput"] = false;
+								this.dialogForShowData.push(row);
+							}
+						})
+					)
+					.catch(error => {
+						this.$message.error("error! 请检查网络连接");
+					});
+			},
+
+			/* 点击 dialog 一行中的第一个 button 触发此方法 */
+			dialogForShowButton1Clicked(index, row) {
+				if (row.button1Type === "primary") {
+					row.button1Type = "success";
+					row.button1Icon = "el-icon-check";
+					row.valueBoxIsInput = true;
+				} else {
+					row.button1Type = "primary";
+					row.button1Icon = "el-icon-edit";
+					row.valueBoxIsInput = false;
+					axios
+						.post("/update_attr", {
+							name: this.addS(this.dialogForShowTitle),
+							key: row.key,
+							value: row.value
+						})
+						.then(rsp => {
+							if (rsp.data["success"] == true) {
+								this.$message.success("修改成功！");
+								this.dialogForShowData[index].value = row.value;
+							} else this.$message.error("修改失败！");
+						})
+						.catch(error => {
+							this.$message.error("修改失败！");
+						});
+				}
+			},
+
+			/* 点击 dialog 一行中的删除按钮触发此方法 */
+			dialogForShowButton2Clicked(index, row) {
+				axios
+					.post("/delete_attr", {
+						name: this.addS(this.dialogForShowTitle),
+						key: row.key
+					})
+					.then(rsp => {
+						if (rsp.data["success"] == true) {
+							this.$message.success("删除成功！");
+							this.dialogForShowData[index].value = "";
+						} else this.$message.error("删除失败！");
+					})
+					.catch(error => {
+						this.$message.error("删除失败！");
+					});
+			},
+
+			/* 查询依据改变时触发此方法 */
+			queryBasisChange() {
+				this.searchInputValue = this.specificChoiceValue = this.dateSelectValue =
+					""; // 清空输入框的内容
+				this.currentPage = 1; // 页面回到 1
+				if (this.queryBasisValue === "原因" || this.queryBasisValue === "结果")
+					this.valueBoxType = "search";
+				else if (this.queryBasisValue === "时间") this.valueBoxType = "date";
+				else {
+					this.specificChoiceLoading = true;
+					this.valueBoxType = "select";
+					this.specificChoicePlaceholder = "选择" + this.queryBasisValue;
+					axios
+						.get("/all_detail?key=" + this.queryBasisValue)
+						.then(rsp => {
+							if (this.queryBasisValue === "事件名称")
+								this.specificChoiceOptions = rsp.data.map(item =>
+									this.removeS(item)
+								);
+							else this.specificChoiceOptions = rsp.data;
+							this.specificChoiceLoading = false;
 						})
 						.catch(error => {
 							this.$message.error("error! 请检查网络连接");
 						});
 				}
-			});
-		</script>
-	</body>
-</html>
+			},
+
+			/* 点击 “查询” 按钮时触发此方法 */
+			searchEventIntro() {
+				let key = this.queryBasisValue;
+				let value;
+				if (this.valueBoxType === "search") value = this.searchInputValue;
+				else if (this.valueBoxType === "date") value = this.dateSelectValue;
+				else value = this.specificChoiceValue;
+				if (key === "事件名称") value = this.addS(value);
+				this.pagerRequestUrl = `/events_intro?key=${key}&value=${value}&page=`;
+				axios
+					.get(this.pagerRequestUrl + "1")
+					.then(rsp => {
+						this.pageCount = rsp.data.pop()["page_num"];
+						this.eventsIntro = rsp.data.map(item => {
+							item["事件名称"] = this.removeS(item["事件名称"]);
+							return item;
+						});
+					})
+					.catch(error => {
+						this.$message.error("error! 请检查网络连接");
+					});
+			},
+
+			/* 页码变化时触发此方法 */
+			pagerCurrentChange(val) {
+				axios
+					.get(this.pagerRequestUrl + val)
+					.then(rsp => {
+						this.pageCount = rsp.data.pop()["page_num"];
+						this.eventsIntro = rsp.data.map(item => {
+							item["事件名称"] = this.removeS(item["事件名称"]);
+							return item;
+						});
+					})
+					.catch(error => {
+						this.$message.error("error! 请检查网络连接");
+					});
+			}
+		},
+
+		filters: {
+			/* 将航班号过滤为图片路径 */
+			imgPath(planeType) {
+				return "/static/aircrafts/" + planeType.trim() + ".jpeg";
+			}
+		},
+
+		mounted() {
+			axios
+				.get("/pattern_bottom")
+				.then(rsp => {
+					let data = rsp.data;
+					data.unshift("事件名称");
+					for (let i of data) {
+						let row = {};
+						row.key = i;
+						row.value = "";
+						this.dialogForAddData.push(row);
+					}
+					data.splice(data.indexOf("人员伤亡"), 1);
+					this.queryBasisOptions = data;
+					this.queryBasisLoading = false;
+				})
+				.catch(error => {
+					this.$message.error("error! 请检查网络连接");
+				});
+			axios
+				.get(this.pagerRequestUrl + "1")
+				.then(rsp => {
+					this.pageCount = rsp.data.pop()["page_num"];
+					this.eventsIntro = rsp.data.map(item => {
+						item["事件名称"] = this.removeS(item["事件名称"]);
+						return item;
+					});
+				})
+				.catch(error => {
+					this.$message.error("error! 请检查网络连接");
+				});
+		}
+	});
+</script>
+{% endblock %}

@@ -1,157 +1,176 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}首页{% endblock %}
+
+{% block outer_css %}
+<link
+	href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css"
+	rel="stylesheet"
+/>
+<link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='css/style.css') }}"
+/>
+{% endblock %}
 
 {% block main_content %}
-	<div class="left">
-		<div id="carouselText" class="carousel slide" data-ride="carousel">
-			<div class="carousel-inner">
-				<div class="carousel-item active">
-					<h1>航空安全事件知识图谱</h1>
-					<h3>Knowledge graph for aviation safety events</h3>
-					<p>
-						事件检索：以知识卡片的形式展示指定航空安全事件的具体信息，用户可以选择不同的查询方式。
-					</p>
-					<a href="/event_search">Learn more</a>
-				</div>
-				<div class="carousel-item">
-					<h1>航空安全事件知识图谱</h1>
-					<h3>Knowledge graph for aviation safety events</h3>
-					<p>模式图：以力导向图的形式展示航空安全事件的模式数据。</p>
-					<a href="/pattern">Learn more</a>
-				</div>
-				<div class="carousel-item">
-					<h1>航空安全事件知识图谱</h1>
-					<h3>Knowledge graph for aviation safety events</h3>
-					<p>
-						数据图：以力导向图的形式展示部分航空安全事件，并在前端支持可视化的增删查改。
-					</p>
-					<a href="/data_graph">Learn more</a>
-				</div>
-				<div class="carousel-item">
-					<h1>航空安全事件知识图谱</h1>
-					<h3>Knowledge graph for aviation safety events</h3>
-					<p>
-						数据统计：对事件的高频属性值进行统计分析，以图表方式展示统计结果。
-					</p>
-					<a href="#">Learn more</a>
-				</div>
+<div class="left">
+	<div id="carouselText" class="carousel slide" data-ride="carousel">
+		<div class="carousel-inner">
+			<div class="carousel-item active">
+				<h1>航空安全事件知识图谱</h1>
+				<h3>Knowledge graph for aviation safety events</h3>
+				<p>
+					事件检索：以知识卡片的形式展示指定航空安全事件的具体信息，用户可以选择不同的查询方式。
+				</p>
+				<a href="/event_search">Learn more</a>
 			</div>
-			<a
-				class="carousel-control-prev"
-				href="#carouselText"
-				role="button"
-				data-slide="prev"
-			>
-				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-				<span class="sr-only">Previous</span>
-			</a>
-			<a
-				class="carousel-control-next"
-				href="#carouselText"
-				role="button"
-				data-slide="next"
-			>
-				<span class="carousel-control-next-icon" aria-hidden="true"></span>
-				<span class="sr-only">Next</span>
-			</a>
+			<div class="carousel-item">
+				<h1>航空安全事件知识图谱</h1>
+				<h3>Knowledge graph for aviation safety events</h3>
+				<p>模式图：以力导向图的形式展示航空安全事件的模式数据。</p>
+				<a href="/pattern">Learn more</a>
+			</div>
+			<div class="carousel-item">
+				<h1>航空安全事件知识图谱</h1>
+				<h3>Knowledge graph for aviation safety events</h3>
+				<p>
+					数据图：以力导向图的形式展示部分航空安全事件，并在前端支持可视化的增删查改。
+				</p>
+				<a href="/data_graph">Learn more</a>
+			</div>
+			<div class="carousel-item">
+				<h1>航空安全事件知识图谱</h1>
+				<h3>Knowledge graph for aviation safety events</h3>
+				<p>
+					数据统计：对事件的高频属性值进行统计分析，以图表方式展示统计结果。
+				</p>
+				<a href="#">Learn more</a>
+			</div>
 		</div>
+		<a
+			class="carousel-control-prev"
+			href="#carouselText"
+			role="button"
+			data-slide="prev"
+		>
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="sr-only">Previous</span>
+		</a>
+		<a
+			class="carousel-control-next"
+			href="#carouselText"
+			role="button"
+			data-slide="next"
+		>
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="sr-only">Next</span>
+		</a>
 	</div>
-	<div class="right">
-		<div class="wrapper">
-			<h1>功能直通车</h1>
-			<ul class="functions">
-				<li>
-					<a href="/event_search">
-						<div>
-							<img
-								src="{{ url_for('static', filename='images/检索2.png') }}"
-								alt="事件检索"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/检索.png') }}"
-								alt="事件检索"
-							/>
-						</div>
-						<h5>事件检索</h5></a
-					>
-				</li>
-				<li>
-					<a href="/pattern">
-						<div>
-							<img
-								src="{{ url_for('static', filename='images/模式图2.png') }}"
-								alt="模式图"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/模式图.png') }}"
-								alt="模式图"
-							/>
-						</div>
-						<h5>模式图</h5></a
-					>
-				</li>
-				<li>
-					<a href="/data_graph">
-						<div class="smaller-img">
-							<img
-								src="{{ url_for('static', filename='images/数据图2.png') }}"
-								alt="数据图"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/数据图.png') }}"
-								alt="数据图"
-							/>
-						</div>
-						<h5>数据图</h5></a
-					>
-				</li>
-				<li>
-					<a href="/statistics">
-						<div>
-							<img
-								src="{{ url_for('static', filename='images/统计2.png') }}"
-								alt="数据统计"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/统计.png') }}"
-								alt="数据统计"
-							/>
-						</div>
-						<h5>数据统计</h5></a
-					>
-				</li>
-				<li>
-					<a href="#">
-						<div class="smaller-img">
-							<img
-								src="{{ url_for('static', filename='images/帮助2.png') }}"
-								alt="使用帮助"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/帮助.png') }}"
-								alt="使用帮助"
-							/>
-						</div>
-						<h5>使用帮助</h5></a
-					>
-				</li>
-				<li>
-					<a href="#">
-						<div>
-							<img
-								src="{{ url_for('static', filename='images/管理员2.png') }}"
-								alt="管理员入口"
-							/>
-							<img
-								src="{{ url_for('static', filename='images/管理员.png') }}"
-								alt="管理员入口"
-							/>
-						</div>
-						<h5>管理员入口</h5></a
-					>
-				</li>
-			</ul>
-		</div>
+</div>
+<div class="right">
+	<div class="wrapper">
+		<h1>功能直通车</h1>
+		<ul class="functions">
+			<li>
+				<a href="/event_search">
+					<div>
+						<img
+							src="{{ url_for('static', filename='images/检索2.png') }}"
+							alt="事件检索"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/检索.png') }}"
+							alt="事件检索"
+						/>
+					</div>
+					<h5>事件检索</h5></a
+				>
+			</li>
+			<li>
+				<a href="/pattern">
+					<div>
+						<img
+							src="{{ url_for('static', filename='images/模式图2.png') }}"
+							alt="模式图"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/模式图.png') }}"
+							alt="模式图"
+						/>
+					</div>
+					<h5>模式图</h5></a
+				>
+			</li>
+			<li>
+				<a href="/data_graph">
+					<div class="smaller-img">
+						<img
+							src="{{ url_for('static', filename='images/数据图2.png') }}"
+							alt="数据图"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/数据图.png') }}"
+							alt="数据图"
+						/>
+					</div>
+					<h5>数据图</h5></a
+				>
+			</li>
+			<li>
+				<a href="/statistics">
+					<div>
+						<img
+							src="{{ url_for('static', filename='images/统计2.png') }}"
+							alt="数据统计"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/统计.png') }}"
+							alt="数据统计"
+						/>
+					</div>
+					<h5>数据统计</h5></a
+				>
+			</li>
+			<li>
+				<a href="#">
+					<div class="smaller-img">
+						<img
+							src="{{ url_for('static', filename='images/帮助2.png') }}"
+							alt="使用帮助"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/帮助.png') }}"
+							alt="使用帮助"
+						/>
+					</div>
+					<h5>使用帮助</h5></a
+				>
+			</li>
+			<li>
+				<a href="#">
+					<div>
+						<img
+							src="{{ url_for('static', filename='images/管理员2.png') }}"
+							alt="管理员入口"
+						/>
+						<img
+							src="{{ url_for('static', filename='images/管理员.png') }}"
+							alt="管理员入口"
+						/>
+					</div>
+					<h5>管理员入口</h5></a
+				>
+			</li>
+		</ul>
 	</div>
+</div>
+{% endblock %}
+
+{% block outer_script_in_body %}
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

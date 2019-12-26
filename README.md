@@ -4,15 +4,15 @@ A knowledge graph of aviation safety event.
 
 ## 任务分工
 
-@onlyone 负责数据库建立，数据库备份数据会以 7_30_8.dump（7 月 30 日备份文件包含 8 个事件信息）文件形式上传。
+@onlyone 负责数据库建立。
 
 恢复数据库：
 
 ```powershell
-./neo4j-admin load --from=/home/2016-10-02.dump --database=graph.db --force
+./neo4j-admin load --from=/home/database.dump --database=graph.db --force
 ```
 
-数据库备注：所有事件名称与 Excel 表格里面数据有所差别，如原始记录为 12.20AS-73 的时间名称数据库中将会存为 1220AS_73。已存入数据库的数据存放在 sheet2 中，还未存的数据存放在 sheet1 中。
+数据库备注：所有事件名称与 Excel 表格里面数据有所差别，如原始记录为 12.20AS-73 的事件名称数据库中将会存为 1220AS_73。已存入数据库的数据存放在 sheet2 中，还未存的数据存放在 sheet1 中。
 
 @marsvet 负责前端设计。
 

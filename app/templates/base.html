@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 	<head>
 		<title>{% block title %}{% endblock %}</title>
+
 		<!-- Required meta tags -->
 		<meta charset="utf-8" />
 		<meta
@@ -10,35 +11,34 @@
 		/>
 
 		<!-- Icon -->
-		<link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
-		<link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
-
-		<!-- Bootstrap CSS -->
 		<link
-			href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css"
-			rel="stylesheet"
+			rel="shortcut icon"
+			href="{{ url_for('static', filename='images/favicon.png') }}"
+		/>
+		<link
+			rel="icon"
+			href="{{ url_for('static', filename='images/favicon.png') }}"
 		/>
 
-		<!-- Element -->
-		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<!-- Outer CSS -->
 		{% block outer_css %}{% endblock %}
+
+		<!-- Outer script in head -->
+		{% block outer_script_in_head %}{% endblock %}
+
+		<!-- Inner CSS -->
 		{% block inner_css %}{% endblock %}
-		{% block inner_script %}{% endblock %}
+
+		<!-- Inner script in head -->
+		{% block inner_script_in_head %}{% endblock %}
 	</head>
 	<body>
 		{% block main_content %}{% endblock %}
 
-		<!-- Optional JavaScript -->
-		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-		<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
-		<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-		<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-		{% block outer_script %}{% endblock %}
-		{% block inner_script2 %}{% endblock %}
+		<!-- outer_script_in_body -->
+		{% block outer_script_in_body %}{% endblock %}
+
+		<!-- inner_script_in_body -->
+		{% block inner_script_in_body %}{% endblock %}
 	</body>
 </html>

@@ -1,37 +1,169 @@
-{% extends "base.html" %}
-
-{% block title %}{{ title }}{% endblock %}
-
-{% block outer_css %}
+{% extends "base.html" %} {% block title %}模式图{% endblock %} {% block
+outer_css %}
+<link
+	rel="stylesheet"
+	href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+/>
 <link
 	rel="stylesheet"
 	href="{{ url_for('static', filename='css/chart.css') }}"
 />
-{% endblock %}
+{% endblock %} {% block inner_css %}
+<style>
+	/* general */
+	* {
+		margin: 0;
+		padding: 0;
+	}
 
-{% block outer_script %}
+	a {
+		color: black;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: none;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	button:hover {
+		outline: none;
+	}
+
+	[v-cloak] {
+		display: none;
+	}
+	/* general */
+
+	/* header */
+	.el-header {
+		padding: 0;
+		height: 66px !important;
+		position: fixed;
+		z-index: 10;
+		width: 100%;
+	}
+
+	.el-header li {
+		height: 63px !important;
+	}
+
+	.brand {
+		margin-right: 40px !important;
+		margin-left: 10px !important;
+		color: #fff !important;
+		font-size: 1.25rem;
+	}
+
+	.brand > img {
+		height: 40px;
+		margin-right: 5px;
+	}
+	/* header */
+
+	.svg-container {
+		width: 100%;
+		min-height: calc(100vh - 63px);
+		padding: 0;
+		margin-top: 63px;
+	}
+</style>
+{% endblock %} {% block outer_script_in_head %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% endblock %} {% block main_content %}
+<div id="app" v-cloak>
+	<el-container>
+		<el-header class="navbar">
+			<el-menu
+				:default-active="activeIndex"
+				class="el-menu"
+				mode="horizontal"
+				@select="handleSelect"
+				background-color="#343A40"
+				text-color="#999C9F"
+				active-text-color="#fff"
+			>
+				<el-menu-item index="1" class="brand">
+					<img
+						src="{{ url_for('static', filename='images/logo.svg') }}"
+						alt="Logo"
+					/>
+					ASE Knowledge Graph
+				</el-menu-item>
+				<el-menu-item index="2">首页</el-menu-item>
+				<el-menu-item index="3">事件检索</el-menu-item>
+				<el-menu-item index="4">模式图</el-menu-item>
+				<el-menu-item index="5">数据图</el-menu-item>
+				<el-menu-item index="6">数据统计</el-menu-item>
+				<el-menu-item index="7">帮助</el-menu-item>
+			</el-menu></el-header
+		>
+		<el-container class="aside-and-main">
+			<el-main class="svg-container"></el-main>
+		</el-container>
+	</el-container>
+</div>
+{% endblock %} {% block outer_script_in_body %}
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="{{ url_for('static', filename='js/chart-lib.js') }}"></script>
 <script src="{{ url_for('static', filename='js/force-directed-graph-lib.js') }}"></script>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-{% endblock %}
-
-{% block inner_script %}
+{% endblock %} {% block inner_script_in_body %}
 <script>
-	window.onload = () => {
-		const WIDTH = screen.availWidth;
-		const HEIGHT = screen.availHeight - $("#navbar").outerHeight();
-		// 这个高度让 svg 在浏览器全屏模式下刚好占满屏幕
+	let vm = new Vue({
+		el: "#app",
+		data: {
+			activeIndex: "4", // 当前活动页面（从 1 开始）
+			navbarUrl: [
+				"/",
+				"/",
+				"/event_search",
+				"/pattern",
+				"/data_graph",
+				"/statistics",
+				"#"
+			],
 
-		let svg = createSvg(WIDTH, HEIGHT, true, "mainSvg");
-		$("#mainSvg").attr("id", $("#navbar").outerHeight());
-		let aForceDirectedGraph = forceDirectedGraph(svg)
-			.linksEndPoint("id")
-			.json("/patt_node")
-			.render();
-	}
+			SVG_WIDTH: 0,
+			SVG_HEIGHT: 0
+		},
+
+		methods: {
+			/* 点击导航栏时触发 */
+			handleSelect(key) {
+				location.href = this.navbarUrl[Number(key) - 1];
+			}
+		},
+
+		mounted() {
+			/* 创建一个临时的元素，用于把 100% 等转化为像素 */
+			$(".svg-container").append("<svg></svg>");
+			let tempSvg = $(".svg-container > svg");
+			tempSvg.attr("width", "100%");
+			tempSvg.attr("height", "calc(100vh - 6px)");
+			let svgSource = document.querySelector(".svg-container > svg");
+			this.SVG_WIDTH = svgSource.clientWidth;
+			this.SVG_HEIGHT = svgSource.clientHeight;
+			tempSvg.remove();
+
+			let svg = createSvg(
+				this.SVG_WIDTH,
+				this.SVG_HEIGHT,
+				true,
+				"main-svg",
+				".svg-container"
+			);
+			$("#main-svg").attr("id", $("#navbar").outerHeight());
+			let aForceDirectedGraph = forceDirectedGraph(svg)
+				.linksEndPoint("id")
+				.json("/patt_node")
+				.render();
+		}
+	});
 </script>
-{% endblock %}
-
-{% block main_content %}
-	{% include "include/navbar.html" %}
 {% endblock %}
