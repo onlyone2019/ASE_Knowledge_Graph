@@ -296,19 +296,19 @@ def event_search():
 
 @app.route('/pattern')
 def pattern_graph():
-    return render_template("pattern.html", title='模式图', active=3)
+    return render_template("pattern.html")
 
 
 @app.route('/data_graph')
 def data_graph():
     options = get_pattern_bottom()
-    return render_template("data-graph.html", title='数据图', options=options, active=4)
+    return render_template("data-graph.html")
 
 
 @app.route('/statistics')
 def statistics():
     options = get_pattern_bottom()
-    return render_template("statistics.html", title='数据图', options=options, active=4)
+    return render_template("statistics.html")
 
 
 @app.route('/pattern_bottom')
