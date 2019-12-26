@@ -17,9 +17,9 @@ class Config:
     # SECRET_KEY = os.environ.get('SECRET_KEY')
     JSON_AS_ASCII = False
     PY2NEO_CONFIG = {       # py2neo 连接配置
-        "host": "localhost",
+        "host": "47.94.94.136",
         "username": "neo4j",
-        "password": "comeon2017"
+        "password": "1358044937"
     }
 
     @staticmethod
