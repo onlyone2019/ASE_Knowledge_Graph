@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, jsonify
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from addevent import addevent
 from get_pattern_bottom import get_pattern_bottom
-from config import app
+from config import app, graph
 
 @app.route("/index")
 @app.route("/")
