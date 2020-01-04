@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}首页{% endblock %}
+{% block title %}管理员登录{% endblock %}
 
 {% block outer_css %}
+<link
+	rel="stylesheet"
+	href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+/>
 <link
 	href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -15,6 +19,70 @@
 	rel="stylesheet"
 	href="{{ url_for('static', filename='css/index.css') }}"
 />
+{% endblock %}
+
+{% block inner_css %}
+<style>
+	/* general */
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	a {
+		color: black;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: none;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	button:hover {
+		outline: none;
+	}
+
+	[v-cloak] {
+		display: none;
+	}
+	/* general */
+
+	/* form */
+	#app {
+		width: 51%;
+		height: 100vh;
+		float: right;
+	}
+
+	.wrapper {
+		width: 60%;
+		margin: auto;
+		position: relative;
+		top: 20%;
+	}
+
+	.title {
+		text-align: center;
+		font-weight: bold;
+		margin-bottom: 50px;
+	}
+
+	.login-button {
+		text-align: right;
+		margin-top: 40px;
+	}
+	/* form */
+</style>
+{% endblock %}
+
+{% block outer_script_in_head %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 {% endblock %}
 
 {% block main_content %}
@@ -72,101 +140,20 @@
 		</a>
 	</div>
 </div>
-<div class="right">
+<div id="app">
 	<div class="wrapper">
-		<h1>功能直通车</h1>
-		<ul class="functions">
-			<li>
-				<a href="/event_search">
-					<div>
-						<img
-							src="{{ url_for('static', filename='images/检索2.png') }}"
-							alt="事件检索"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/检索.png') }}"
-							alt="事件检索"
-						/>
-					</div>
-					<h5>事件检索</h5></a
-				>
-			</li>
-			<li>
-				<a href="/pattern">
-					<div>
-						<img
-							src="{{ url_for('static', filename='images/模式图2.png') }}"
-							alt="模式图"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/模式图.png') }}"
-							alt="模式图"
-						/>
-					</div>
-					<h5>模式图</h5></a
-				>
-			</li>
-			<li>
-				<a href="/data_graph">
-					<div class="smaller-img">
-						<img
-							src="{{ url_for('static', filename='images/数据图2.png') }}"
-							alt="数据图"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/数据图.png') }}"
-							alt="数据图"
-						/>
-					</div>
-					<h5>数据图</h5></a
-				>
-			</li>
-			<li>
-				<a href="/statistics">
-					<div>
-						<img
-							src="{{ url_for('static', filename='images/统计2.png') }}"
-							alt="数据统计"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/统计.png') }}"
-							alt="数据统计"
-						/>
-					</div>
-					<h5>数据统计</h5></a
-				>
-			</li>
-			<li>
-				<a href="#">
-					<div class="smaller-img">
-						<img
-							src="{{ url_for('static', filename='images/帮助2.png') }}"
-							alt="使用帮助"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/帮助.png') }}"
-							alt="使用帮助"
-						/>
-					</div>
-					<h5>使用帮助</h5></a
-				>
-			</li>
-			<li>
-				<a href="/login">
-					<div>
-						<img
-							src="{{ url_for('static', filename='images/管理员2.png') }}"
-							alt="管理员入口"
-						/>
-						<img
-							src="{{ url_for('static', filename='images/管理员.png') }}"
-							alt="管理员入口"
-						/>
-					</div>
-					<h5>管理员入口</h5></a
-				>
-			</li>
-		</ul>
+		<h1 class="title">管理员登录</h1>
+		<el-form :model="adminInfo">
+			<el-form-item label="用户名">
+				<el-input v-model="adminInfo.username"></el-input>
+			</el-form-item>
+			<el-form-item label="密码">
+				<el-input v-model="adminInfo.password"></el-input>
+			</el-form-item>
+			<el-form-item class="login-button">
+				<el-button type="primary" @click="submitForm()">登录</el-button>
+			</el-form-item>
+		</el-form>
 	</div>
 </div>
 {% endblock %}
@@ -177,4 +164,58 @@
 <script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
+
+{% block inner_script_in_body %}
+<script>
+	let vm = new Vue({
+		el: "#app",
+		data: {
+			activeIndex: "4", // 当前活动页面（从 1 开始）
+			navbarUrl: [
+				"/",
+				"/",
+				"/event_search",
+				"/pattern",
+				"/data_graph",
+				"/statistics",
+				"#"
+			],
+
+			adminInfo: {
+				username: "",
+				password: ""
+			}
+		},
+
+		methods: {
+			/* 点击导航栏时触发 */
+			handleSelect(key) {
+				location.href = this.navbarUrl[Number(key) - 1];
+			},
+
+			/* 登录 */
+			submitForm() {
+				this.adminInfo.username = this.adminInfo.username.trim();
+				this.adminInfo.password = this.adminInfo.password.trim();
+				if (this.adminInfo.username != "" && this.adminInfo.password != "") {
+					axios
+						.post("/verifyAdmin", this.adminInfo)
+						.then(rsp => {
+							if (rsp.data["success"] == true) {
+								location.href = this.navbarUrl[2];
+							} else {
+								this.$message.error("用户名或密码错误！");
+							}
+						})
+						.catch(error => {
+							this.$message.error("error! 请检查网络连接");
+						});
+				} else {
+					this.$message.error("用户名和密码不能为空！");
+				}
+			}
+		}
+	});
+</script>
 {% endblock %}

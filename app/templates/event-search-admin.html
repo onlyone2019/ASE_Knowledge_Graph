@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}事件检索{% endblock %}
+{% block title %}事件管理{% endblock %}
 
 {% block outer_css %}
 <link
@@ -206,6 +206,18 @@
 						display: block"
 					>查询</el-button
 				>
+				<el-button
+					type="info"
+					icon="el-icon-plus"
+					@click="dialogForAddVisible = true"
+					style="
+						display: inline-block;
+						margin-top: 100px;
+						width: 66px;
+						height: 66px;"
+					plain
+					circle
+				></el-button>
 			</el-aside>
 			<el-main class="event-card-container">
 				<el-row
@@ -256,11 +268,18 @@
 									margin-top: 20px;"
 								>
 									<el-button
+										type="danger"
+										size="small"
+										plain
+										@click="deleteEvent(event)"
+										>删除</el-button
+									>
+									<el-button
 										type="primary"
 										size="small"
 										plain
-										@click="showCardDetails(event.事件名称)"
-										>查看完整信息</el-button
+										@click="showAndUpdateCardDetails(event.事件名称)"
+										>查看 / 修改</el-button
 									>
 								</el-row>
 							</div>
@@ -291,12 +310,53 @@
 				<el-table-column property="key" label="属性"></el-table-column>
 				<el-table-column property="value" label="值">
 					<template slot-scope="scope">
+						<el-input
+							v-model="scope.row.value"
+							v-if="scope.row.valueBoxIsInput"
+							size="mini"
+						></el-input>
 						{% raw %}
-						<span>{{ scope.row.value }}</span>
+						<span v-else>{{ scope.row.value }}</span>
 						{% endraw %}
 					</template>
 				</el-table-column>
+				<el-table-column property="button" label="操作" align="center">
+					<template slot-scope="scope">
+						<el-button
+							size="mini"
+							circle
+							:type="scope.row.button1Type"
+							@click="dialogForShowButton1Clicked(scope.$index, scope.row)"
+							:icon="scope.row.button1Icon"
+						></el-button>
+						<el-button
+							size="mini"
+							circle
+							type="danger"
+							@click="dialogForShowButton2Clicked(scope.$index, scope.row)"
+							icon="el-icon-delete"
+						></el-button>
+					</template>
+				</el-table-column>
 			</el-table>
+		</el-dialog>
+		<el-dialog
+			title="添加航空安全事件"
+			:visible.sync="dialogForAddVisible"
+			center
+		>
+			<el-table :data="dialogForAddData">
+				<el-table-column property="key" label="属性"></el-table-column>
+				<el-table-column property="value" label="值" align="center">
+					<template slot-scope="scope">
+						<el-input v-model="scope.row.value" size="small"></el-input>
+					</template>
+				</el-table-column>
+			</el-table>
+			<div style="margin: 30px auto; text-align: right;">
+				<el-button @click="dialogForAddVisible = false">取消</el-button>
+				<el-button type="primary" @click="addEvent()">提交</el-button>
+			</div>
 		</el-dialog>
 	</el-container>
 </div>
@@ -349,9 +409,16 @@
 			dialogForShowData: [
 				{
 					key: "",
-					value: ""
+					value: "",
+					button1Type: "primary",
+					button1Icon: "el-icon-edit",
+					valueBoxIsInput: false
 				}
-			]
+			],
+
+			/* 用来添加事件的弹出框 */
+			dialogForAddVisible: false,
+			dialogForAddData: []
 		},
 
 		methods: {
@@ -368,8 +435,51 @@
 				location.href = this.navbarUrl[Number(key) - 1];
 			},
 
+			/* 添加一个事件 */
+			addEvent() {
+				let data = {};
+				for (let i of this.dialogForAddData) data[i.key] = i.value.trim();
+				if (data.事件名称 === "" || data.时间 == "") {
+					this.$message.error("事件名称 和 时间 为必填项！");
+					return;
+				}
+				data.事件名称 = this.addS(data.事件名称);
+				axios
+					.post("/add_oneevent", data)
+					.then(rsp => {
+						if (rsp.data["success"] == true) {
+							this.dialogForAddVisible = false;
+							this.$message.success("添加成功！");
+							this.dialogForAddData = this.dialogForAddData.map(item => {
+								item.value = "";
+								return item;
+							});
+						} else this.$message.error("添加失败！");
+					})
+					.catch(error => {
+						this.$message.error("添加失败！");
+					});
+			},
+
+			/* 点击卡片上的 “删除” 按钮触发此方法 */
+			deleteEvent(event) {
+				axios
+					.post("/del_oneevent", {
+						事件名称: this.addS(event.事件名称.trim())
+					})
+					.then(rsp => {
+						if (rsp.data.success == true) {
+							this.eventsIntro.splice(this.eventsIntro.indexOf(event), 1);
+							this.$message.success("删除成功！");
+						} else this.$message.error("删除失败！");
+					})
+					.catch(error => {
+						this.$message.error("删除失败！");
+					});
+			},
+
 			/* 点击卡片上的 “查看 / 修改” 按钮触发此方法*/
-			showCardDetails(eventName) {
+			showAndUpdateCardDetails(eventName) {
 				this.dialogForShowTitle = eventName;
 				this.dialogForShowVisible = true;
 				let data = {};
@@ -385,16 +495,66 @@
 							data["事件名称"] = this.removeS(data["事件名称"]);
 							this.dialogForShowData = [];
 							for (let i in data) {
+								// 不允许修改事件名称
 								if (i == "事件名称") continue;
 								let row = {};
 								row["key"] = i;
 								row["value"] = data[i];
+								row["button1Type"] = "primary";
+								row["button1Icon"] = "el-icon-edit";
+								row["valueBoxIsInput"] = false;
 								this.dialogForShowData.push(row);
 							}
 						})
 					)
 					.catch(error => {
 						this.$message.error("error! 请检查网络连接");
+					});
+			},
+
+			/* 点击 dialog 一行中的第一个 button 触发此方法 */
+			dialogForShowButton1Clicked(index, row) {
+				if (row.button1Type === "primary") {
+					row.button1Type = "success";
+					row.button1Icon = "el-icon-check";
+					row.valueBoxIsInput = true;
+				} else {
+					row.button1Type = "primary";
+					row.button1Icon = "el-icon-edit";
+					row.valueBoxIsInput = false;
+					axios
+						.post("/update_attr", {
+							name: this.addS(this.dialogForShowTitle),
+							key: row.key,
+							value: row.value
+						})
+						.then(rsp => {
+							if (rsp.data["success"] == true) {
+								this.$message.success("修改成功！");
+								this.dialogForShowData[index].value = row.value;
+							} else this.$message.error("修改失败！");
+						})
+						.catch(error => {
+							this.$message.error("修改失败！");
+						});
+				}
+			},
+
+			/* 点击 dialog 一行中的删除按钮触发此方法 */
+			dialogForShowButton2Clicked(index, row) {
+				axios
+					.post("/delete_attr", {
+						name: this.addS(this.dialogForShowTitle),
+						key: row.key
+					})
+					.then(rsp => {
+						if (rsp.data["success"] == true) {
+							this.$message.success("删除成功！");
+							this.dialogForShowData[index].value = "";
+						} else this.$message.error("删除失败！");
+					})
+					.catch(error => {
+						this.$message.error("删除失败！");
 					});
 			},
 
@@ -479,6 +639,12 @@
 				.then(rsp => {
 					let data = rsp.data;
 					data.unshift("事件名称");
+					for (let i of data) {
+						let row = {};
+						row.key = i;
+						row.value = "";
+						this.dialogForAddData.push(row);
+					}
 					data.splice(data.indexOf("人员伤亡"), 1);
 					this.queryBasisOptions = data;
 					this.queryBasisLoading = false;

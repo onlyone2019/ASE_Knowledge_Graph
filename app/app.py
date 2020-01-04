@@ -5,11 +5,12 @@ import re
 import os
 import jieba
 import config
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from addevent import addevent
 from get_pattern_bottom import get_pattern_bottom
 from config import app, graph
+
 
 @app.route("/index")
 @app.route("/")
@@ -19,6 +20,8 @@ def index():
 
 @app.route("/event_search")
 def event_search():
+    if session.get("is_admin") == True:
+        return render_template("event-search-admin.html")
     return render_template("event-search.html")
 
 
@@ -29,14 +32,27 @@ def pattern_graph():
 
 @app.route('/data_graph')
 def data_graph():
-    options = get_pattern_bottom()
     return render_template("data-graph.html")
 
 
 @app.route('/statistics')
 def statistics():
-    options = get_pattern_bottom()
     return render_template("statistics.html")
+
+
+@app.route('/login')
+def admin_login():
+    return render_template("login.html")
+
+
+@app.route('/verifyAdmin', methods=["POST"])
+def verify_admin():
+    username = request.json["username"]
+    password = request.json["password"]
+    if username == "admin" and password == "123":   # 暂时写死，需要把 "admin" 和 "123" 改为从数据库获取的用户名和密码
+        session["is_admin"] = True
+        return jsonify({"success": True})
+    return jsonify({"success": False})
 
 
 @app.route('/pattern_bottom')
@@ -57,7 +73,7 @@ def get_all_events_intro():  # 返回page页事件的简介信息
     if startnum == 0:
         index = 16
     else:
-        index=15
+        index = 15
     newstr = strdata[startnum: (startnum + index)]
     events = []
     for name in newstr:

@@ -1,8 +1,9 @@
 from py2neo import Graph, Node, Relationship, NodeMatcher
 from flask import Flask
 from flask_scss import Scss
+import os
 class Config:
-    # SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY') or "the secret key"
     JSON_AS_ASCII = False
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
@@ -13,7 +14,7 @@ class Config:
     @staticmethod
     def init_app(app):
         pass
-    
+
 app = Flask(__name__)
 config = Config()
 app.config.from_object(config)
