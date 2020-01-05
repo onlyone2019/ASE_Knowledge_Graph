@@ -44,14 +44,20 @@ def statistics():
 def admin_login():
     return render_template("login.html")
 
-
+matcher = NodeMatcher(graph)
 @app.route('/verifyAdmin', methods=["POST"])
 def verify_admin():
     username = request.json["username"]
     password = request.json["password"]
-    if username == "admin" and password == "123":   # 暂时写死，需要把 "admin" 和 "123" 改为从数据库获取的用户名和密码
-        session["is_admin"] = True
-        return jsonify({"success": True})
+    find_name = matcher.match(username, name=username).first()
+    if find_name == None:
+        return jsonify({"success": False})
+    find_pwd = graph.run("match (a) where a.name='%s' return a.password" % username)
+    for item in find_pwd:
+        pwd = item['a.password']
+        if pwd == password:
+            session["is_admin"] = True
+            return jsonify({"success": True})
     return jsonify({"success": False})
 
 

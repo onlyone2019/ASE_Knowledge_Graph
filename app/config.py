@@ -8,7 +8,7 @@ class Config:
     PY2NEO_CONFIG = {       # py2neo 连接配置
         "host": "localhost",
         "username": "neo4j",
-        "password": "**********"
+        "password": "*******"
     }
 
     @staticmethod
