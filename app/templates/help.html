@@ -1,0 +1,284 @@
+{% extends "base.html" %} {% block title %}帮助{% endblock %} {% block outer_css
+%}
+<link
+	rel="stylesheet"
+	href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+/>
+{% endblock %} {% block inner_css %}
+<style>
+	/* general */
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	a {
+		color: black;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: none;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	button:hover {
+		outline: none;
+	}
+
+	[v-cloak] {
+		display: none;
+	}
+	/* general */
+
+	/* header */
+	.el-header {
+		padding: 0;
+		height: 66px !important;
+		position: fixed;
+		z-index: 10;
+		width: 100%;
+	}
+
+	.el-header li {
+		height: 63px !important;
+	}
+
+	.brand {
+		margin-right: 40px !important;
+		margin-left: 10px !important;
+		color: #fff !important;
+		font-size: 1.25rem;
+	}
+
+	.brand > img {
+		height: 40px;
+		margin-right: 5px;
+	}
+	/* header */
+
+	/* main */
+	.main {
+		width: 75%;
+		margin: 63px auto;
+	}
+
+	.main h1 {
+		font-size: 2.3em;
+	}
+
+	.main h2 {
+		font-size: 1.9em;
+	}
+
+	.main h3 {
+		font-size: 1.5em;
+	}
+
+	.main p{
+		font-size: 1.2em;
+		margin: 15px 0;
+	}
+
+	.main img {
+		display: block;
+		width: 100%;
+		margin: 15px 0;
+	}
+
+	.level2, .level3 {
+		padding: 1em 3em;
+	}
+	/* main */
+</style>
+{% endblock %} {% block outer_script_in_head %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{% endblock %} {% block main_content %}
+<div id="app" v-cloak>
+	<el-container>
+		<el-header class="navbar">
+			<el-menu
+				:default-active="activeIndex"
+				class="el-menu"
+				mode="horizontal"
+				@select="handleSelect"
+				background-color="#343A40"
+				text-color="#999C9F"
+				active-text-color="#fff"
+			>
+				<el-menu-item index="1" class="brand">
+					<img
+						src="{{ url_for('static', filename='images/logo.svg') }}"
+						alt="Logo"
+					/>
+					ASE Knowledge Graph
+				</el-menu-item>
+				<el-menu-item index="2">首页</el-menu-item>
+				<el-menu-item index="3">事件检索</el-menu-item>
+				<el-menu-item index="4">模式图</el-menu-item>
+				<el-menu-item index="5">数据图</el-menu-item>
+				<el-menu-item index="6">数据统计</el-menu-item>
+				<el-menu-item index="7">帮助</el-menu-item>
+			</el-menu></el-header
+		>
+		<el-main class="main">
+			<div class="level1">
+				<h2>一、普通用户使用</h2>
+				<div class="level2">
+					<h3>1. 进入系统首页</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/1.png') }}" />
+						<p>
+							具体操作：首页左部分是轮播图介绍系统主要功能，点击亦可进入具体功能界面；
+						</p>
+						<p>
+							首页右部分是系统各功能的集中，根据用户需求点击进入使用对应功能；
+						</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>2. 进入事件检索功能模块</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/2.png') }}" />
+						<img src="{{ url_for('static', filename='screenshoots/3.png') }}" />
+						<p>
+							具体操作：进入事件检索功能模块后根据用户自身需要在界面左部完成特定检索查询,查询依据共16种，分别为事件名称、航线类型、出事地点、结果、航班号、起飞地点、操作阶段、等级、客机型号、时间、原因、事件类型、天气情况、航班类型、降落地点、航空公司。选择某一查询依据后对应下一下拉选框为相应可选项，数据来源为后台数据库，未绑定数据源的需用户手动输入，例如以原因为查询依据。最后再点击查询，查询结构返回到界面右部显示。
+						</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>3. 进入模式图展示模块</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/4.png') }}" />
+						<p>具体操作：点击导航栏上的模式图即可查看模式图。</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>4. 进入数据图展示模块</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/5.png') }}" />
+						<p>
+							具体操作：点击导航栏数据图进入数据图展示模块，左部仍可如同事件检索功能模块的检索方式，不同之处为返回的结果是以边相连的图结点的形式反映当前查询信息对应结点以及与该结点有关系的结点；
+						</p>
+						<p>例如以航空公司为查询依据，选择新加坡航空公司，返回结果如下图</p>
+						<img src="{{ url_for('static', filename='screenshoots/6.png') }}" />
+						<p>
+							操作结果：包含了与航空公司为新加坡航空公司相关联的0228SQ_226事件。
+						</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>5. 进入数据统计功能模块</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/7.png') }}" />
+						<img src="{{ url_for('static', filename='screenshoots/8.png') }}" />
+						<p>
+							具体操作：点击导航栏数据统计进入该功能模块，上方可输入年限，例如上图统计2012至2016年所发生的航空安全事件，将鼠标移至对应图表可显示统计结果。
+						</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>6. 查看使用帮助</h3>
+					<div class="level3"></div>
+				</div>
+				<h2>二、管理员使用</h2>
+				<div class="level2">
+					<h3>1. 管理员登录</h3>
+					<div class="level3">
+						<img src="{{ url_for('static', filename='screenshoots/9.png') }}" />
+						<p>
+							具体操作：回到系统首页点击管理员入口，输入管理员用户名与密码，点击登录。
+						</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>2. 管理员进行事件检索操作</h3>
+					<div class="level3">
+						<img
+							src="{{ url_for('static', filename='screenshoots/10.png') }}"
+						/>
+						<p>
+							具体操作：管理员登录系统后，以上所述功能均可使用，进行事件检索后，在返回的知识卡片增加了删除和修改选项，管理员可以点击进行相应信息管理。
+						</p>
+						<p>
+							例如下图以客机型号为查询依据查询A319_100客机型号对应航空安全事件：
+						</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/11.png') }}"
+						/>
+						<p>点击0305U2_6164事件下的查看：</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/12.png') }}"
+						/>
+						<p>
+							界面跳出弹框，点击蓝色图标即可修改，点击红色图标可删除该事件属性对应值；
+						</p>
+						<p>修改人员伤亡信息：</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/13.png') }}"
+						/>
+						<p>
+							填入数据后点击绿色按钮，即可保存，再次查询该事件人员伤亡信息时，显示人员伤亡为100:
+						</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/14.png') }}"
+						/>
+						<p>点击红色删除按钮，即可删除该属性的值：</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/15.png') }}"
+						/>
+						<p>
+							关闭弹框后，点击0305U2_6164事件下的删除可一键删除该航空安全事件：
+						</p>
+						<img
+							src="{{ url_for('static', filename='screenshoots/16.png') }}"
+						/>
+						<p>再次检索数据库已无0305U2_6164事件。</p>
+					</div>
+				</div>
+				<div class="level2">
+					<h3>3. 管理员新增事件</h3>
+					<div class="level3">
+						<img
+							src="{{ url_for('static', filename='screenshoots/17.png') }}"
+						/>
+						<p>
+							具体操作：点击界面左部的加号按钮，即可弹出添加航空安全事件弹框，根据相应属性添加相应值后保存。
+						</p>
+					</div>
+				</div>
+			</div>
+		</el-main>
+	</el-container>
+</div>
+{% endblock %} {% block inner_script_in_body %}
+<script>
+	let vm = new Vue({
+		el: "#app",
+		data: {
+			activeIndex: "7", // 当前活动页面（从 1 开始）
+			navbarUrl: [
+				"/",
+				"/",
+				"/event_search",
+				"/pattern",
+				"/data_graph",
+				"/statistics",
+				"/help"
+			]
+		},
+
+		methods: {
+			/* 点击导航栏时触发 */
+			handleSelect(key) {
+				location.href = this.navbarUrl[Number(key) - 1];
+			}
+		}
+	});
+</script>
+{% endblock %}

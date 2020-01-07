@@ -40,9 +40,15 @@ def statistics():
     return render_template("statistics.html")
 
 
+@app.route('/help')
+def help_page():
+    return render_template("help.html")
+
+
 @app.route('/login')
 def admin_login():
     return render_template("login.html")
+
 
 matcher = NodeMatcher(graph)
 @app.route('/verifyAdmin', methods=["POST"])
@@ -52,7 +58,8 @@ def verify_admin():
     find_name = matcher.match(username, name=username).first()
     if find_name == None:
         return jsonify({"success": False})
-    find_pwd = graph.run("match (a) where a.name='%s' return a.password" % username)
+    find_pwd = graph.run(
+        "match (a) where a.name='%s' return a.password" % username)
     for item in find_pwd:
         pwd = item['a.password']
         if pwd == password:
